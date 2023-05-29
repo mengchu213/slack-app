@@ -1,11 +1,9 @@
-import {LoginForm} from "./Auth/Login";
-import {RegistrationForm} from "./Auth/SignUp";
+import {AuthForm} from "./Auth/AuthForm";
 
 function App() {
   return (
     <>
-      <LoginForm />
-      <RegistrationForm />
+      <AuthForm />
     </>
   );
 }

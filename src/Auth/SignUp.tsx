@@ -47,7 +47,7 @@ export const RegistrationForm = () => {
     <>
       <button
         onClick={handleOpenModal}
-        className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800"
       >
         Sign Up
       </button>
@@ -77,39 +77,74 @@ export const RegistrationForm = () => {
                     onSubmit={handleSubmit}
                     className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4"
                   >
-                    <label>
-                      Email:
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        required
-                        className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                      />
-                    </label>
-                    <label>
-                      Password:
-                      <input
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        required
-                        className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                      />
-                    </label>
-                    <label>
-                      Confirm Password:
-                      <input
-                        type="password"
-                        name="password_confirmation"
-                        value={formData.password_confirmation}
-                        onChange={handleInputChange}
-                        required
-                        className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                      />
-                    </label>
+                    <div className="mb-6">
+                      <label
+                        htmlFor="email"
+                        className="block mb-2 text-sm font-medium text-gray-900 "
+                      >
+                        Email
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          required
+                          className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                        />
+                      </label>
+                    </div>
+                    <div className="mb-6">
+                      <label
+                        htmlFor="password"
+                        className="block mb-2 text-sm font-medium text-gray-900"
+                      >
+                        Your password
+                        <input
+                          type="password"
+                          name="password"
+                          value={formData.password}
+                          onChange={handleInputChange}
+                          required
+                          className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                        />
+                      </label>
+                    </div>
+                    <div className="mb-6">
+                      <label
+                        htmlFor="repeat-password"
+                        className="block mb-2 text-sm font-medium text-gray-900"
+                      >
+                        Repeat password
+                        <input
+                          type="password"
+                          name="password_confirmation"
+                          value={formData.password_confirmation}
+                          onChange={handleInputChange}
+                          required
+                          className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 "
+                        />
+                      </label>
+                    </div>
+                    <div className="flex items-start mb-6">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="terms"
+                          type="checkbox"
+                          value=""
+                          className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 cursor-pointer"
+                          required
+                        />
+                      </div>
+                      <label
+                        htmlFor="terms"
+                        className="ml-2 text-sm font-medium text-gray-900 "
+                      >
+                        I agree with the{" "}
+                        <a href="#" className="text-blue-600 hover:underline ">
+                          terms and conditions
+                        </a>
+                      </label>
+                    </div>
                     {errorMessage && (
                       <p className="text-red-500">{errorMessage}</p>
                     )}
@@ -118,9 +153,9 @@ export const RegistrationForm = () => {
                     )}
                     <button
                       type="submit"
-                      className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                      className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
                     >
-                      Sign Up
+                      Register new account
                     </button>
                   </form>
                 </div>
@@ -132,3 +167,4 @@ export const RegistrationForm = () => {
     </>
   );
 };
+export default RegistrationForm;
