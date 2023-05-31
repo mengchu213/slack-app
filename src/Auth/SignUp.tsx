@@ -1,20 +1,32 @@
 import {useState} from "react";
 import {registerUser} from "../utils/api";
 import Modal from "./Modal";
-import RegistrationFormFields, {FormData} from "./RegistrationFormFields";
+import RegistrationFormFields from "./RegistrationFormFields";
+import {useNavigate} from "react-router-dom";
+
+interface RegistrationData {
+  email: string;
+  password: string;
+  password_confirmation: string;
+}
 
 export const RegistrationForm = () => {
+  const navigate = useNavigate();
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [isModalOpen, setModalOpen] = useState(false);
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleSubmit = async (formData: RegistrationData) => {
     try {
       const headers = await registerUser(formData);
       console.log(headers);
       setSuccessMessage("Register successful");
 
+      // Save the user data in local storage.
       localStorage.setItem("user", JSON.stringify(formData));
+
+      // Redirect to the Dashboard page.
+      navigate("/dashboard");
     } catch (error) {
       console.error(error);
       setErrorMessage("Failed to register user");

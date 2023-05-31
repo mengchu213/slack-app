@@ -1,5 +1,6 @@
 import {useState} from "react";
 import {loginUser, getUsers} from "../utils/api";
+import {useNavigate} from "react-router-dom";
 
 interface LoginFormData {
   email: string;
@@ -7,6 +8,7 @@ interface LoginFormData {
 }
 
 export const LoginForm = () => {
+  const navigate = useNavigate(); // new line
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
@@ -30,6 +32,9 @@ export const LoginForm = () => {
       console.log(userList);
 
       setSuccessMessage("Login successful");
+
+      // new line: navigate to Dashboard
+      navigate("/dashboard");
     } catch (error) {
       console.error(error);
       setErrorMessage("Invalid email or password");
