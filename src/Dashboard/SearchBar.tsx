@@ -14,13 +14,16 @@ const SearchBar: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="searchbar">
+    <form
+      onSubmit={handleSubmit}
+      className="searchbar w-8 flex justify-center items-center "
+    >
       <input
         type="text"
         placeholder="Search"
         value={searchTerm}
         onChange={handleChange}
-        className="searchbar__input"
+        className="searchbar__input bg-gray-700 rounded-xl py-1 px-10 "
       />
     </form>
   );

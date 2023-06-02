@@ -12,27 +12,31 @@ const Dashboard = () => {
   const [showNewDirectMessage, setShowNewDirectMessage] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
 
+  const handleAddChannel = () => {
+    setShowNewChannel(true);
+  };
+
   return (
     <div className="flex flex-col h-screen">
       <Header />
       <div className="flex flex-grow">
-        <Sidebar />
+        <Sidebar onAddChannel={handleAddChannel} />
         <Workspace />
       </div>
 
       {showNewChannel && (
-        <Modal>
+        <Modal onClose={() => setShowNewChannel(false)}>
           <NewChannelForm />
         </Modal>
       )}
       {showNewDirectMessage && (
-        <Modal>
+        <Modal onClose={() => setShowNewDirectMessage(false)}>
           <NewDirectMessageForm />
         </Modal>
       )}
       {showUserProfile && (
-        <Modal>
-          <UserProfile />
+        <Modal onClose={() => setShowUserProfile(false)}>
+          <UserProfile name="User Name" email="user@example.com" />
         </Modal>
       )}
     </div>

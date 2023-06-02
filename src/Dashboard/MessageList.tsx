@@ -8,7 +8,7 @@ const MessageList = () => {
   ];
 
   return (
-    <ul>
+    <ul className="flex-grow overflow-auto">
       {messages.map((message) => (
         <MessageItem key={message.id} message={message} />
       ))}

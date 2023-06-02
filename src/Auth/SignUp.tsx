@@ -48,7 +48,7 @@ export const RegistrationForm = () => {
         Sign Up
       </button>
       {isModalOpen && (
-        <Modal>
+        <Modal onClose={handleCloseModal}>
           <div
             className="fixed z-10 inset-0 overflow-y-auto"
             aria-labelledby="modal-title"
