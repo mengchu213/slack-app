@@ -1,4 +1,3 @@
-// UserProfile.tsx
 import React from "react";
 
 interface UserProfileProps {

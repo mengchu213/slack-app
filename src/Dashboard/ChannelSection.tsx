@@ -9,7 +9,7 @@ const ChannelSection = () => {
       </div>
       <ChannelItem />
       <ChannelItem />
-      {/* ... */}
+      {}
     </div>
   );
 };

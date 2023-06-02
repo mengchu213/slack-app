@@ -9,7 +9,7 @@ const SearchBar: React.FC = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // TODO: Implement search logic
+
     console.log(`Searching for "${searchTerm}"`);
   };
 

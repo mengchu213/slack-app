@@ -11,7 +11,7 @@ const MessageInput = () => {
     event.preventDefault();
     console.log("Send message:", message);
     setMessage("");
-    // Here you would typically send the message to your backend.
+    //send the message to your backend.
   };
 
   return (
