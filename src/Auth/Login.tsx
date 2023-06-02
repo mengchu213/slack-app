@@ -8,7 +8,7 @@ interface LoginFormData {
 }
 
 export const LoginForm = () => {
-  const navigate = useNavigate(); // new line
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
@@ -33,7 +33,6 @@ export const LoginForm = () => {
 
       setSuccessMessage("Login successful");
 
-      // new line: navigate to Dashboard
       navigate("/dashboard");
     } catch (error) {
       console.error(error);

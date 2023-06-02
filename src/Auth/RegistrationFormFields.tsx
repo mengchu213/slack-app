@@ -27,15 +27,12 @@ export const RegistrationFormFields: React.FC<RegistrationFormFieldsProps> = ({
     }));
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    handleFormSubmit(formData);
-  };
-
   return (
     <form
-      onSubmit={handleSubmit}
-      className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4"
+      onSubmit={(event) => {
+        event.preventDefault();
+        handleFormSubmit(formData);
+      }}
     >
       <div className="mb-6">
         <label

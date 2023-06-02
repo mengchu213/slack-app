@@ -22,10 +22,8 @@ export const RegistrationForm = () => {
       console.log(headers);
       setSuccessMessage("Register successful");
 
-      // Save the user data in local storage.
       localStorage.setItem("user", JSON.stringify(formData));
 
-      // Redirect to the Dashboard page.
       navigate("/dashboard");
     } catch (error) {
       console.error(error);
