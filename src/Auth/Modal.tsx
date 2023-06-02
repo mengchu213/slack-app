@@ -1,4 +1,4 @@
-import React, {useEffect, ReactNode} from "react";
+import {useEffect, ReactNode} from "react";
 import {createPortal} from "react-dom";
 
 interface ModalProps {

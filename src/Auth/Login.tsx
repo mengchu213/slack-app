@@ -1,6 +1,6 @@
-import {useState} from "react";
-import {loginUser, getUsers} from "../utils/api";
-import {useNavigate} from "react-router-dom";
+import { useEffect, useState } from "react";
+import { loginUser, getUsers, getMessages } from "../utils/api";
+import { useNavigate } from "react-router-dom";
 
 interface LoginFormData {
   email: string;
@@ -17,28 +17,64 @@ export const LoginForm = () => {
   const [successMessage, setSuccessMessage] = useState("");
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = event.target;
-    setFormData((prevFormData) => ({...prevFormData, [name]: value}));
+    const { name, value } = event.target;
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
       const headers = await loginUser(formData);
-      localStorage.setItem("access-token", headers["access-token"]);
       console.log(headers);
-
-      const userList = await getUsers(headers);
-      console.log(userList);
-
+      localStorage.setItem("auth", JSON.stringify(headers));
+      const email = formData.email;
+      const userListResponse = await getUsers(headers);
+      const userList = userListResponse.data;
+      const messages: any[] = [];
+      const maxConcurrentRequests = 10;
+      let promisePool = [];
+      let receiverId;
+      JSON.parse(localStorage.getItem("auth") || "{}");
       setSuccessMessage("Login successful");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
+      for (let current = 0; current < userList.length; current++) {
+        if (userList[current].id !== receiverId) {
+          const promise = getMessages(userList[current].id, "User", headers);
+          promisePool.push(promise);
 
-      navigate("/dashboard");
+          if (promisePool.length >= maxConcurrentRequests || current === userList.length - 1) {
+            const messagesResponse = await Promise.all(promisePool);
+            messages.push(...messagesResponse);
+
+            promisePool = [];
+          }
+        }
+      }
+      const matchingUser = userList.find(user => user.uid === email);
+      if (matchingUser) {
+        receiverId = matchingUser.id;
+        localStorage.setItem('currentUser', JSON.stringify(receiverId))
+      }
+      const filteredMessages = messages.filter((item) => item.data.length > 0);
+      localStorage.setItem(`${receiverId}`, JSON.stringify(filteredMessages));
     } catch (error) {
       console.error(error);
       setErrorMessage("Invalid email or password");
     }
   };
+
+  useEffect(() => {
+    const { "access-token": accessToken, client, expiry, uid } = JSON.parse(localStorage.getItem("auth") || "{}");
+    if (accessToken && client && expiry && uid) {
+      setTimeout(() => {
+        navigate("/dashboard");
+        setSuccessMessage("");
+        setErrorMessage("");
+      }, 10);
+    }
+  }, []);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">

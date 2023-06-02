@@ -1,39 +1,48 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
+import { registerUser } from "../utils/api";
 
-export interface FormData {
+export interface RegistrationFormFields {
   email: string;
   password: string;
   password_confirmation: string;
 }
 
-interface RegistrationFormFieldsProps {
-  handleFormSubmit: (formData: FormData) => void;
+interface Props {
+  setModalOpen: (showSignUp: boolean) => void;
+  setErrorMessage: (errorMessage: string) => void;
+  setSuccessMessage: (successMessage: string) => void;
 }
 
-export const RegistrationFormFields: React.FC<RegistrationFormFieldsProps> = ({
-  handleFormSubmit,
-}) => {
-  const [formData, setFormData] = useState<FormData>({
+export const RegistrationFormFields = ({ setModalOpen, setErrorMessage, setSuccessMessage }: Props) => {
+  const [formData, setFormData] = useState<RegistrationFormFields>({
     email: "",
     password: "",
     password_confirmation: "",
   });
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = event.target;
-    setFormData((prevFormData: FormData) => ({
-      ...prevFormData,
-      [name]: value,
-    }));
+    const { name, value } = event.target;
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSuccessMessage("");
+    setErrorMessage("");
+    try {
+      await registerUser(formData);
+      setSuccessMessage(
+        "Sign up successful. Please log in to continue."
+      );
+      setTimeout(() => {setModalOpen(false);}, 2000);
+    } catch (error) {
+      console.error(error);
+      setErrorMessage("Failed to register user");
+    }
   };
 
   return (
-    <form
-      onSubmit={(event) => {
-        event.preventDefault();
-        handleFormSubmit(formData);
-      }}
-    >
+    <form onSubmit={handleSubmit}>
       <div className="mb-6">
         <label
           htmlFor="email"
@@ -103,7 +112,7 @@ export const RegistrationFormFields: React.FC<RegistrationFormFieldsProps> = ({
       </div>
       <button
         type="submit"
-        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-l from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800"
       >
         Register new account
       </button>
