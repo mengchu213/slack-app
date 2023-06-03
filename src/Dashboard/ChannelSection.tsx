@@ -3,9 +3,13 @@ import ChannelItem from "./ChannelItem";
 
 interface ChannelSectionProps {
   onAddChannel: () => void;
+  channels: Array<{id: string; name: string}>; // Adjust according to your data structure.
 }
 
-const ChannelSection: React.FC<ChannelSectionProps> = ({onAddChannel}) => {
+const ChannelSection: React.FC<ChannelSectionProps> = ({
+  onAddChannel,
+  channels,
+}) => {
   return (
     <div>
       <div className="px-5 py-3 flex justify-between items-center">
@@ -29,8 +33,9 @@ const ChannelSection: React.FC<ChannelSectionProps> = ({onAddChannel}) => {
           </svg>
         </button>
       </div>
-      <ChannelItem />
-      <ChannelItem />
+      {channels.map((channel) => (
+        <ChannelItem key={channel.id} name={channel.name} />
+      ))}
     </div>
   );
 };

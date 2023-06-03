@@ -40,7 +40,7 @@ const Modal = ({children, onClose}: ModalProps) => {
   }, [el, onClose]);
 
   return createPortal(
-    <div className="bg-gray-300 rounded px-16 py-10 ">{children}</div>,
+    <div className="bg-gray-300 rounded-lg px-16 py-10 ">{children}</div>,
     el
   );
 };

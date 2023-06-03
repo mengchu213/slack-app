@@ -3,7 +3,6 @@ import key from "./keys";
 
 const API_URL = key.API_URL;
 
-
 interface RegistrationData {
   email: string;
   password: string;
@@ -15,22 +14,16 @@ interface LoginData {
   password: string;
 }
 
-interface UserList {
+interface User {
   id: number;
   email: string;
-  data?: object;
-  uid?: string;
+  created_at: string;
+  updated_at: string;
 }
 
-interface UsersChannnel {
-  id: number;
-}
-
-interface Message {
-  receiver_id: number;
-  receiver_class: string;
-  body: string;
-  data?: object;
+interface ChannelData {
+  name: string;
+  user_ids: number[];
 }
 
 export const registerUser = async (registrationData: RegistrationData) => {
@@ -53,9 +46,11 @@ export const loginUser = async (loginData: LoginData) => {
   }
 };
 
-export const getUsers = async (headers: any): Promise<{ uid: string, data: UserList[] }> => {
+export const getUsers = async (
+  headers: any
+): Promise<{uid: string; data: UserList[]}> => {
   const authData = JSON.parse(localStorage.getItem("auth") || "{}");
-  const { "access-token": accessToken, client, expiry, uid } = authData;
+  const {"access-token": accessToken, client, expiry, uid} = authData;
 
   try {
     const response = await axios.get(`${API_URL}/users`, {
@@ -63,8 +58,8 @@ export const getUsers = async (headers: any): Promise<{ uid: string, data: UserL
         "access-token": accessToken,
         client: client,
         expiry: expiry,
-        uid: uid
-      }
+        uid: uid,
+      },
     });
     return response.data;
   } catch (error) {
@@ -73,9 +68,11 @@ export const getUsers = async (headers: any): Promise<{ uid: string, data: UserL
   }
 };
 
-export const getUsersChannel = async (headers: any): Promise<UsersChannnel[]> => {
+export const getUsersChannel = async (
+  headers: any
+): Promise<UsersChannnel[]> => {
   const authData = JSON.parse(localStorage.getItem("auth") || "{}");
-  const { "access-token": accessToken, client, expiry, uid } = authData;
+  const {"access-token": accessToken, client, expiry, uid} = authData;
 
   try {
     const response = await axios.get(`${API_URL}/channels`, {
@@ -83,8 +80,8 @@ export const getUsersChannel = async (headers: any): Promise<UsersChannnel[]> =>
         "access-token": accessToken,
         client: client,
         expiry: expiry,
-        uid: uid
-      }
+        uid: uid,
+      },
     });
     return response.data;
   } catch (error) {
@@ -93,22 +90,26 @@ export const getUsersChannel = async (headers: any): Promise<UsersChannnel[]> =>
   }
 };
 
-export const getMessages = async (receiverId: number, receiverClass: string, headers: any): Promise<{data: Message[]}> => {
+export const getMessages = async (
+  receiverId: number,
+  receiverClass: string,
+  headers: any
+): Promise<{data: Message[]}> => {
   const authData = JSON.parse(localStorage.getItem("auth") || "{}");
-  const { "access-token": accessToken, client, expiry, uid } = authData;
+  const {"access-token": accessToken, client, expiry, uid} = authData;
 
   try {
     const response = await axios.get(`${API_URL}/messages`, {
       params: {
         receiver_id: receiverId,
-        receiver_class: receiverClass
+        receiver_class: receiverClass,
       },
       headers: {
         "access-token": accessToken,
         client: client,
         expiry: expiry,
-        uid: uid
-      }
+        uid: uid,
+      },
     });
     return response.data;
   } catch (error) {
@@ -117,10 +118,9 @@ export const getMessages = async (receiverId: number, receiverClass: string, hea
   }
 };
 
-
 export const sendMessage = async (messageData: Message, headers: any) => {
   const authData = JSON.parse(localStorage.getItem("auth") || "{}");
-  const { "access-token": accessToken, client, expiry, uid } = authData;
+  const {"access-token": accessToken, client, expiry, uid} = authData;
 
   try {
     const response = await axios.post(`${API_URL}/messages`, messageData, {
@@ -128,8 +128,19 @@ export const sendMessage = async (messageData: Message, headers: any) => {
         "access-token": accessToken,
         client: client,
         expiry: expiry,
-        uid: uid
-      }
+        uid: uid,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+export const createChannel = async (channelData: ChannelData, headers: any) => {
+  try {
+    const response = await axios.post(`${API_URL}/channels`, channelData, {
+      headers,
     });
     return response.data;
   } catch (error) {
