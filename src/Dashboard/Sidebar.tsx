@@ -4,9 +4,10 @@ import DirectMessageSection from "./DirectMessageSection";
 
 interface SidebarProps {
   onAddChannel: () => void;
+  onAddUser: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({onAddChannel}) => {
+const Sidebar: React.FC<SidebarProps> = ({onAddChannel, onAddUser}) => {
   return (
     <div className="h-screen w-64 bg-gray-800 text-white overflow-auto">
       <div className="px-5 py-5">
@@ -14,7 +15,7 @@ const Sidebar: React.FC<SidebarProps> = ({onAddChannel}) => {
       </div>
       <hr />
       <ChannelSection onAddChannel={onAddChannel} />
-      <DirectMessageSection />
+      <DirectMessageSection onAddUser={onAddUser}/>
     </div>
   );
 };

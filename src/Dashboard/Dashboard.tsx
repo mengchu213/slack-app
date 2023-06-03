@@ -19,6 +19,10 @@ const Dashboard = () => {
     setShowNewChannel(true);
   };
 
+  const handleAddUser = () => {
+    setShowNewDirectMessage(true);
+  };
+
   const handleLogout = () => {
     localStorage.removeItem('auth');
     localStorage.removeItem('currentUser');
@@ -42,7 +46,7 @@ const Dashboard = () => {
       </button>
       <Header />
       <div className="flex flex-grow">
-        <Sidebar onAddChannel={handleAddChannel} />
+        <Sidebar onAddChannel={handleAddChannel} onAddUser={handleAddUser}/>
         <Workspace />
       </div>
 

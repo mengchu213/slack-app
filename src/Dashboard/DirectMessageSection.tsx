@@ -1,9 +1,20 @@
-const DirectMessageSection = () => {
+import { DirectMessageItems } from "./DirectMessageItem";
+import React from "react";
+
+
+interface DirectMessageSection {
+  onAddUser: () => void;
+}
+
+const DirectMessageSection: React.FC<DirectMessageSection> = ({ onAddUser }) => {
   return (
     <div>
       <div className="px-5 py-3 flex justify-between items-center">
         <h2 className="font-semibold">Direct Messages</h2>
-        <button className="text-white bg-blue-600 hover:bg-blue-700 focus:ring-blue-800 focus:ring-4 focus:outline-none font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center mr-2 ">
+        <button
+          className="text-white bg-blue-600 hover:bg-blue-700 focus:ring-blue-800 focus:ring-4 focus:outline-none font-medium rounded-lg text-sm p-2.5 text-center inline-flex items-center mr-2 "
+          onClick={onAddUser}
+        >
           <svg
             aria-hidden="true"
             className="w-5 h-5"
@@ -19,10 +30,7 @@ const DirectMessageSection = () => {
           </svg>
         </button>
       </div>
-      <div className="px-5 py-1 hover:bg-gray-600 cursor-pointer">
-        User Name
-      </div>
-      {}
+      <DirectMessageItems />
     </div>
   );
 };
