@@ -34,11 +34,11 @@ export const RegistrationFormFields = ({ setModalOpen, setErrorMessage, setSucce
       setSuccessMessage(
         "Sign up successful. Please log in to continue."
       );
-      setTimeout(() => {setModalOpen(false);}, 2000);
     } catch (error) {
       console.error(error);
       setErrorMessage("Failed to register user");
     }
+    setTimeout(() => {setModalOpen(false);}, 2000);
   };
 
   return (
