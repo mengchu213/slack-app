@@ -1,10 +1,15 @@
-import {AuthForm} from "./Auth/AuthForm";
+import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import AuthForm from "./Auth/AuthForm";
+import Dashboard from "./Dashboard/Dashboard";
 
 function App() {
   return (
-    <>
-      <AuthForm />
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<AuthForm />} />
+        <Route path="/dashboard" element={<Dashboard />} /> {}
+      </Routes>
+    </Router>
   );
 }
 

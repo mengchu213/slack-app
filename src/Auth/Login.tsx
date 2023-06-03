@@ -1,24 +1,21 @@
-import { useState } from "react";
-import { loginUser, getUsers } from "../utils/api";
+import { useEffect, useState } from "react";
+import { loginUser, getUsers, getMessages } from "../utils/api";
+import { useNavigate } from "react-router-dom";
 
 interface LoginFormData {
   email: string;
   password: string;
 }
 
-interface Props {
-  handleShowSignUp: (showSignUp: boolean) => void;
-  handleError: (errorMessage: string) => void;
-  handleSuccess: (successMessage: string) => void;
-  checkAuthentication: () => void;
-}
-
-
-export const LoginForm = ({ handleShowSignUp, handleError, handleSuccess, checkAuthentication }: Props) => {
+export const LoginForm = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<LoginFormData>({
     email: "",
     password: "",
   });
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
@@ -26,23 +23,58 @@ export const LoginForm = ({ handleShowSignUp, handleError, handleSuccess, checkA
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    handleSuccess("");
-    handleError("");
     try {
       const headers = await loginUser(formData);
+      console.log(headers);
       localStorage.setItem("auth", JSON.stringify(headers));
-      const authData = JSON.parse(localStorage.getItem("auth") || "{}");
-      console.log(authData);
-      handleSuccess("Login successful"); 
-      const userList = await getUsers(headers);
-      console.log(userList);
-      checkAuthentication();
+      const email = formData.email;
+      const userListResponse = await getUsers(headers);
+      const userList = userListResponse.data;
+      const messages: any[] = [];
+      const maxConcurrentRequests = 100;
+      let promisePool = [];
+      let receiverId;
+      JSON.parse(localStorage.getItem("auth") || "{}");
+      setSuccessMessage("Login successful");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
+      const matchingUser = userList.find(user => user.uid === email);
+      if (matchingUser) {
+        const receiverId = matchingUser.id;
+        localStorage.setItem('currentUser', JSON.stringify(receiverId))
+      }
+      for (let current = 0; current < userList.length; current++) {
+        if (userList[current].id !== receiverId) {
+          const promise = getMessages(userList[current].id, "User", headers);
+          promisePool.push(promise);
+
+          if (promisePool.length >= maxConcurrentRequests || current === userList.length - 1) {
+            const messagesResponse = await Promise.all(promisePool);
+            messages.push(...messagesResponse);
+
+            promisePool = [];
+          }
+        }
+      }
+      const filteredMessages = messages.filter((item) => item.data.length > 0);
+      localStorage.setItem(localStorage.currentUser, JSON.stringify(filteredMessages));
     } catch (error) {
       console.error(error);
-      handleError("Invalid email or password");
+      setErrorMessage("Invalid email or password");
     }
   };
-  
+
+  useEffect(() => {
+    const { "access-token": accessToken, client, expiry, uid } = JSON.parse(localStorage.getItem("auth") || "{}");
+    if (accessToken && client && expiry && uid) {
+      setTimeout(() => {
+        navigate("/dashboard");
+        setSuccessMessage("");
+        setErrorMessage("");
+      }, 10);
+    }
+  }, []);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -68,17 +100,13 @@ export const LoginForm = ({ handleShowSignUp, handleError, handleSuccess, checkA
           className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
         />
       </label>
+      {errorMessage && <p className="text-red-500">{errorMessage}</p>}
+      {successMessage && <p className="text-green-500">{successMessage}</p>}
       <button
         type="submit"
         className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-l from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800"
       >
         Log In
-      </button>
-      <button
-        onClick={() => handleShowSignUp(true)}
-        className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800"
-      >
-        Sign Up
       </button>
     </form>
   );
