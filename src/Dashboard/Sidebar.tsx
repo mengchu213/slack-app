@@ -5,12 +5,14 @@ interface SidebarProps {
   onAddChannel: () => void;
   channels: Array<{id: string; name: string}>;
   setChannels: React.Dispatch<React.SetStateAction<any[]>>;
+  setSelectedChannel: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
   onAddChannel,
   channels,
   setChannels,
+  setSelectedChannel,
 }) => {
   return (
     <div className="h-screen w-64 bg-gray-800 text-white overflow-auto">
@@ -22,6 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         onAddChannel={onAddChannel}
         channels={channels}
         setChannels={setChannels}
+        setSelectedChannel={setSelectedChannel}
       />
       <DirectMessageSection />
     </div>
