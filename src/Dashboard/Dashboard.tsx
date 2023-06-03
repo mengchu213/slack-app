@@ -30,6 +30,24 @@ const Dashboard: React.FC<DashboardProps> = () => {
     setShowNewChannel(true);
   };
 
+  const handleDeleteChannel = (id: string) => {
+    const currentUser = localStorage.getItem("currentUser");
+    if (currentUser) {
+      let storedChannels = JSON.parse(
+        localStorage.getItem(`${currentUser}.channelLists`) || "[]"
+      );
+      storedChannels = storedChannels.filter(
+        (channel: {id: string}) => channel && channel.id !== id
+      );
+
+      localStorage.setItem(
+        `${currentUser}.channelLists`,
+        JSON.stringify(storedChannels)
+      );
+      setChannels(storedChannels);
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("auth");
     localStorage.removeItem("currentUser");
@@ -62,6 +80,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
           channels={channels}
           setChannels={setChannels}
           setSelectedChannel={setSelectedChannel}
+          handleDeleteChannel={handleDeleteChannel}
         />
 
         <Workspace selectedChannel={selectedChannel} />

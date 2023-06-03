@@ -4,8 +4,11 @@ import DirectMessageSection from "./DirectMessageSection";
 interface SidebarProps {
   onAddChannel: () => void;
   channels: Array<{id: string; name: string}>;
-  setChannels: React.Dispatch<React.SetStateAction<any[]>>;
+  setChannels: React.Dispatch<
+    React.SetStateAction<Array<{id: string; name: string}>>
+  >;
   setSelectedChannel: React.Dispatch<React.SetStateAction<string | null>>;
+  handleDeleteChannel: (id: string) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -13,6 +16,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   channels,
   setChannels,
   setSelectedChannel,
+  handleDeleteChannel,
 }) => {
   return (
     <div className="h-screen w-64 bg-gray-800 text-white overflow-auto">
@@ -25,7 +29,9 @@ const Sidebar: React.FC<SidebarProps> = ({
         channels={channels}
         setChannels={setChannels}
         setSelectedChannel={setSelectedChannel}
+        handleDeleteChannel={handleDeleteChannel}
       />
+
       <DirectMessageSection />
     </div>
   );

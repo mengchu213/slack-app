@@ -3,11 +3,12 @@ import ChannelItem from "./ChannelItem";
 
 interface ChannelSectionProps {
   onAddChannel: () => void;
-  channels: {id: string; name: string}[];
+  channels: Array<{id: string; name: string}>;
   setChannels: React.Dispatch<
-    React.SetStateAction<{id: string; name: string}[]>
+    React.SetStateAction<Array<{id: string; name: string}>>
   >;
   setSelectedChannel: React.Dispatch<React.SetStateAction<string | null>>;
+  handleDeleteChannel: (id: string) => void;
 }
 
 const ChannelSection: React.FC<ChannelSectionProps> = ({
@@ -15,6 +16,7 @@ const ChannelSection: React.FC<ChannelSectionProps> = ({
   channels,
   setChannels,
   setSelectedChannel,
+  handleDeleteChannel,
 }) => {
   useEffect(() => {
     const currentUser = localStorage.getItem("currentUser");
@@ -50,11 +52,13 @@ const ChannelSection: React.FC<ChannelSectionProps> = ({
         </button>
       </div>
 
-      {channels.filter(Boolean).map((channel) => (
+      {channels.filter(Boolean).map((channel: {id: string; name: string}) => (
         <ChannelItem
           key={channel.id}
+          id={channel.id}
           name={channel.name}
           setSelectedChannel={setSelectedChannel}
+          handleDeleteChannel={handleDeleteChannel}
         />
       ))}
     </div>
