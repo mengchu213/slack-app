@@ -31,7 +31,7 @@ export const LoginForm = () => {
       const userListResponse = await getUsers(headers);
       const userList = userListResponse.data;
       const messages: any[] = [];
-      const maxConcurrentRequests = 10;
+      const maxConcurrentRequests = 100;
       let promisePool = [];
       let receiverId;
       JSON.parse(localStorage.getItem("auth") || "{}");
@@ -39,6 +39,11 @@ export const LoginForm = () => {
       setTimeout(() => {
         navigate("/dashboard");
       }, 2000);
+      const matchingUser = userList.find(user => user.uid === email);
+      if (matchingUser) {
+        const receiverId = matchingUser.id;
+        localStorage.setItem('currentUser', JSON.stringify(receiverId))
+      }
       for (let current = 0; current < userList.length; current++) {
         if (userList[current].id !== receiverId) {
           const promise = getMessages(userList[current].id, "User", headers);
@@ -52,13 +57,8 @@ export const LoginForm = () => {
           }
         }
       }
-      const matchingUser = userList.find(user => user.uid === email);
-      if (matchingUser) {
-        receiverId = matchingUser.id;
-        localStorage.setItem('currentUser', JSON.stringify(receiverId))
-      }
       const filteredMessages = messages.filter((item) => item.data.length > 0);
-      localStorage.setItem(`${receiverId}`, JSON.stringify(filteredMessages));
+      localStorage.setItem(localStorage.currentUser, JSON.stringify(filteredMessages));
     } catch (error) {
       console.error(error);
       setErrorMessage("Invalid email or password");

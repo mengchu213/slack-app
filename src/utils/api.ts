@@ -30,6 +30,7 @@ interface Message {
   receiver_id: number;
   receiver_class: string;
   body: string;
+  data?: object;
 }
 
 export const registerUser = async (registrationData: RegistrationData) => {
@@ -92,7 +93,7 @@ export const getUsersChannel = async (headers: any): Promise<UsersChannnel[]> =>
   }
 };
 
-export const getMessages = async (receiverId: number, receiverClass: string, headers: any): Promise<Message[]> => {
+export const getMessages = async (receiverId: number, receiverClass: string, headers: any): Promise<{data: Message[]}> => {
   const authData = JSON.parse(localStorage.getItem("auth") || "{}");
   const { "access-token": accessToken, client, expiry, uid } = authData;
 
