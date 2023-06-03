@@ -38,9 +38,7 @@ export const LoginForm = () => {
       let receiverId;
       JSON.parse(localStorage.getItem("auth") || "{}");
       setSuccessMessage("Login successful");
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 2000);
+      navigate("/dashboard");
       const matchingUser = userList.find(user => user.uid === email);
       if (matchingUser) {
         const receiverId = matchingUser.id;
