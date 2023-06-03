@@ -23,6 +23,8 @@ export const LoginForm = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setSuccessMessage("");
+    setErrorMessage("");
     try {
       const headers = await loginUser(formData);
       console.log(headers);
@@ -57,8 +59,33 @@ export const LoginForm = () => {
           }
         }
       }
-      const filteredMessages = messages.filter((item) => item.data.length > 0);
-      localStorage.setItem(localStorage.currentUser, JSON.stringify(filteredMessages));
+
+      const currentUserId: string = localStorage.currentUser || "";
+      console.log(messages);
+      const filteredMessages = messages
+        .filter(item => item.data.some((msg: { sender: any; receiver: any; }) => {
+          const { sender, receiver } = msg;
+          const isSenderOrReceiverCurrentUser =
+            sender.id === currentUserId || receiver.id === currentUserId;
+          return !isSenderOrReceiverCurrentUser;
+        }))
+        .map(item => item.data[0])
+        .map(msg => {
+          const { sender, receiver } = msg;
+          const recipient = sender.id === currentUserId ? receiver : sender;
+          return {
+            id: recipient.id,
+            uid: recipient.uid
+          };
+        });
+      console.log(filteredMessages);
+
+      const userLists = JSON.parse(localStorage.getItem(currentUserId) ?? "{}");
+      userLists.userLists = filteredMessages;
+
+      localStorage.setItem(currentUserId, JSON.stringify(userLists));
+
+
     } catch (error) {
       console.error(error);
       setErrorMessage("Invalid email or password");
