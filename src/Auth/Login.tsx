@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { loginUser, getUsers, getMessages } from "../utils/api";
-import { useNavigate } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {loginUser, getUsers, getMessages} from "../utils/api";
+import {useNavigate} from "react-router-dom";
 
 interface LoginFormData {
   email: string;
@@ -17,8 +17,8 @@ export const LoginForm = () => {
   const [successMessage, setSuccessMessage] = useState("");
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    const {name, value} = event.target;
+    setFormData((prevFormData) => ({...prevFormData, [name]: value}));
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -28,7 +28,7 @@ export const LoginForm = () => {
       console.log(headers);
       localStorage.setItem("auth", JSON.stringify(headers));
       const email = formData.email;
-      const userListResponse = await getUsers(headers);
+      const userListResponse = await getUsers();
       const userList = userListResponse.data;
       const messages: any[] = [];
       const maxConcurrentRequests = 100;
@@ -39,17 +39,20 @@ export const LoginForm = () => {
       setTimeout(() => {
         navigate("/dashboard");
       }, 2000);
-      const matchingUser = userList.find(user => user.uid === email);
+      const matchingUser = userList.find((user) => user.uid === email);
       if (matchingUser) {
         const receiverId = matchingUser.id;
-        localStorage.setItem('currentUser', JSON.stringify(receiverId))
+        localStorage.setItem("currentUser", JSON.stringify(receiverId));
       }
       for (let current = 0; current < userList.length; current++) {
         if (userList[current].id !== receiverId) {
-          const promise = getMessages(userList[current].id, "User", headers);
+          const promise = getMessages(userList[current].id, "User");
           promisePool.push(promise);
 
-          if (promisePool.length >= maxConcurrentRequests || current === userList.length - 1) {
+          if (
+            promisePool.length >= maxConcurrentRequests ||
+            current === userList.length - 1
+          ) {
             const messagesResponse = await Promise.all(promisePool);
             messages.push(...messagesResponse);
 
@@ -58,7 +61,10 @@ export const LoginForm = () => {
         }
       }
       const filteredMessages = messages.filter((item) => item.data.length > 0);
-      localStorage.setItem(localStorage.currentUser, JSON.stringify(filteredMessages));
+      localStorage.setItem(
+        localStorage.currentUser,
+        JSON.stringify(filteredMessages)
+      );
     } catch (error) {
       console.error(error);
       setErrorMessage("Invalid email or password");
@@ -66,7 +72,12 @@ export const LoginForm = () => {
   };
 
   useEffect(() => {
-    const { "access-token": accessToken, client, expiry, uid } = JSON.parse(localStorage.getItem("auth") || "{}");
+    const {
+      "access-token": accessToken,
+      client,
+      expiry,
+      uid,
+    } = JSON.parse(localStorage.getItem("auth") || "{}");
     if (accessToken && client && expiry && uid) {
       setTimeout(() => {
         navigate("/dashboard");

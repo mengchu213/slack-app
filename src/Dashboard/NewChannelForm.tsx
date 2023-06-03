@@ -25,7 +25,7 @@ const NewChannelForm = ({setChannels}: NewChannelFormProps) => {
         const headers = {
           Authorization: `Bearer ${localStorage.getItem("access-token")}`,
         };
-        const response = await getUsers(headers);
+        const response = await getUsers();
         const users = response.data;
         setUsers(users);
       } catch (error) {
@@ -46,7 +46,7 @@ const NewChannelForm = ({setChannels}: NewChannelFormProps) => {
         name: channelName,
         user_ids: selectedUsers.map((user) => user.value),
       };
-      const response = await createChannel(channelData, headers);
+      const response = await createChannel(channelData);
       const newChannel = response.data;
       setChannels((prevChannels) => [...prevChannels, newChannel]);
       setSuccessMessage("Channel created successfully");

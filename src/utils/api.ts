@@ -17,6 +17,7 @@ interface LoginData {
 interface User {
   id: number;
   email: string;
+  uid: string;
   created_at: string;
   updated_at: string;
 }
@@ -24,6 +25,20 @@ interface User {
 interface ChannelData {
   name: string;
   user_ids: number[];
+}
+
+interface Message {
+  id: number;
+  sender_id: number;
+  receiver_id: number;
+  body: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface UsersChannnel {
+  id: number;
+  name: string;
 }
 
 export const registerUser = async (registrationData: RegistrationData) => {
@@ -39,6 +54,13 @@ export const registerUser = async (registrationData: RegistrationData) => {
 export const loginUser = async (loginData: LoginData) => {
   try {
     const response = await axios.post(`${API_URL}/auth/sign_in`, loginData);
+
+    // save these headers in localStorage
+    localStorage.setItem("access-token", response.headers["access-token"]);
+    localStorage.setItem("client", response.headers["client"]);
+    localStorage.setItem("expiry", response.headers["expiry"]);
+    localStorage.setItem("uid", response.headers["uid"]);
+
     return response.headers;
   } catch (error) {
     console.error(error);
@@ -46,20 +68,19 @@ export const loginUser = async (loginData: LoginData) => {
   }
 };
 
-export const getUsers = async (
-  headers: any
-): Promise<{uid: string; data: UserList[]}> => {
-  const authData = JSON.parse(localStorage.getItem("auth") || "{}");
-  const {"access-token": accessToken, client, expiry, uid} = authData;
+export const getAuthHeaders = () => {
+  return {
+    "access-token": localStorage.getItem("access-token") || "",
+    client: localStorage.getItem("client") || "",
+    expiry: localStorage.getItem("expiry") || "",
+    uid: localStorage.getItem("uid") || "",
+  };
+};
 
+export const getUsers = async (): Promise<{uid: string; data: User[]}> => {
   try {
     const response = await axios.get(`${API_URL}/users`, {
-      headers: {
-        "access-token": accessToken,
-        client: client,
-        expiry: expiry,
-        uid: uid,
-      },
+      headers: getAuthHeaders(),
     });
     return response.data;
   } catch (error) {
@@ -68,20 +89,10 @@ export const getUsers = async (
   }
 };
 
-export const getUsersChannel = async (
-  headers: any
-): Promise<UsersChannnel[]> => {
-  const authData = JSON.parse(localStorage.getItem("auth") || "{}");
-  const {"access-token": accessToken, client, expiry, uid} = authData;
-
+export const getUsersChannel = async (): Promise<UsersChannnel[]> => {
   try {
     const response = await axios.get(`${API_URL}/channels`, {
-      headers: {
-        "access-token": accessToken,
-        client: client,
-        expiry: expiry,
-        uid: uid,
-      },
+      headers: getAuthHeaders(),
     });
     return response.data;
   } catch (error) {
@@ -92,24 +103,15 @@ export const getUsersChannel = async (
 
 export const getMessages = async (
   receiverId: number,
-  receiverClass: string,
-  headers: any
+  receiverClass: string
 ): Promise<{data: Message[]}> => {
-  const authData = JSON.parse(localStorage.getItem("auth") || "{}");
-  const {"access-token": accessToken, client, expiry, uid} = authData;
-
   try {
     const response = await axios.get(`${API_URL}/messages`, {
       params: {
         receiver_id: receiverId,
         receiver_class: receiverClass,
       },
-      headers: {
-        "access-token": accessToken,
-        client: client,
-        expiry: expiry,
-        uid: uid,
-      },
+      headers: getAuthHeaders(),
     });
     return response.data;
   } catch (error) {
@@ -118,18 +120,10 @@ export const getMessages = async (
   }
 };
 
-export const sendMessage = async (messageData: Message, headers: any) => {
-  const authData = JSON.parse(localStorage.getItem("auth") || "{}");
-  const {"access-token": accessToken, client, expiry, uid} = authData;
-
+export const sendMessage = async (messageData: Message) => {
   try {
     const response = await axios.post(`${API_URL}/messages`, messageData, {
-      headers: {
-        "access-token": accessToken,
-        client: client,
-        expiry: expiry,
-        uid: uid,
-      },
+      headers: getAuthHeaders(),
     });
     return response.data;
   } catch (error) {
@@ -137,10 +131,11 @@ export const sendMessage = async (messageData: Message, headers: any) => {
     throw error;
   }
 };
-export const createChannel = async (channelData: ChannelData, headers: any) => {
+
+export const createChannel = async (channelData: ChannelData) => {
   try {
     const response = await axios.post(`${API_URL}/channels`, channelData, {
-      headers,
+      headers: getAuthHeaders(),
     });
     return response.data;
   } catch (error) {

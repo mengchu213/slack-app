@@ -3,8 +3,8 @@ import React, {useState} from "react";
 import AuthForm from "./Auth/AuthForm";
 import Dashboard from "./Dashboard/Dashboard";
 
-function App() {
-  const [channels, setChannels] = useState([]);
+const App = () => {
+  const [channels, setChannels] = useState<any[]>([]);
 
   return (
     <Router>
@@ -17,6 +17,6 @@ function App() {
       </Routes>
     </Router>
   );
-}
+};
 
 export default App;
