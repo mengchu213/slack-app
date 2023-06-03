@@ -1,15 +1,29 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import ChannelItem from "./ChannelItem";
 
 interface ChannelSectionProps {
   onAddChannel: () => void;
-  channels: Array<{id: string; name: string}>; // Adjust according to your data structure.
+  channels: {id: string; name: string}[];
+  setChannels: React.Dispatch<
+    React.SetStateAction<{id: string; name: string}[]>
+  >;
 }
 
 const ChannelSection: React.FC<ChannelSectionProps> = ({
   onAddChannel,
   channels,
+  setChannels,
 }) => {
+  useEffect(() => {
+    const currentUser = localStorage.getItem("currentUser");
+    if (currentUser) {
+      const storedChannels = JSON.parse(
+        localStorage.getItem(`${currentUser}.channelLists`) || "[]"
+      );
+      setChannels(storedChannels);
+    }
+  }, [setChannels]);
+
   return (
     <div>
       <div className="px-5 py-3 flex justify-between items-center">

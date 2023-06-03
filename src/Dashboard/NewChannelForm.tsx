@@ -49,6 +49,18 @@ const NewChannelForm = ({setChannels}: NewChannelFormProps) => {
       const response = await createChannel(channelData);
       const newChannel = response.data;
       setChannels((prevChannels) => [...prevChannels, newChannel]);
+
+      // Get the list of channels from localStorage, add the new channel to it, and save it back to localStorage
+      const currentUser = localStorage.getItem("currentUser");
+      const storedChannels = JSON.parse(
+        localStorage.getItem(`${currentUser}.channelLists`) || "[]"
+      );
+      storedChannels.push(newChannel);
+      localStorage.setItem(
+        `${currentUser}.channelLists`,
+        JSON.stringify(storedChannels)
+      );
+      setChannels(storedChannels);
       setSuccessMessage("Channel created successfully");
       navigate("/dashboard");
     } catch (error) {

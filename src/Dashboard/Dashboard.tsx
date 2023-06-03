@@ -14,7 +14,10 @@ interface DashboardProps {
   setChannels: Dispatch<SetStateAction<any[]>>; // Same here
   // Other props...
 }
-const Dashboard: React.FC<DashboardProps> = ({channels, setChannels}) => {
+const Dashboard: React.FC<DashboardProps> = () => {
+  const [channels, setChannels] = useState<Array<{id: string; name: string}>>(
+    []
+  );
   const [showNewChannel, setShowNewChannel] = useState(false);
   const [showNewDirectMessage, setShowNewDirectMessage] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
@@ -28,20 +31,17 @@ const Dashboard: React.FC<DashboardProps> = ({channels, setChannels}) => {
   const handleLogout = () => {
     localStorage.removeItem("auth");
     localStorage.removeItem("currentUser");
-    window.location.reload();
+    setChannels([]);
+    navigate("/");
   };
 
   useEffect(() => {
-    const {
-      "access-token": accessToken,
-      client,
-      expiry,
-      uid,
-    } = JSON.parse(localStorage.getItem("auth") || "{}");
-    if (!accessToken && !client && !expiry && !uid) {
-      setTimeout(() => {
-        navigate("/");
-      }, 10);
+    const currentUser = localStorage.getItem("currentUser");
+    if (currentUser) {
+      const storedChannels = JSON.parse(
+        localStorage.getItem(`${currentUser}.channelLists`) || "[]"
+      );
+      setChannels(storedChannels);
     }
   }, []);
 
@@ -55,7 +55,12 @@ const Dashboard: React.FC<DashboardProps> = ({channels, setChannels}) => {
       </button>
       <Header />
       <div className="flex flex-grow">
-        <Sidebar onAddChannel={handleAddChannel} channels={channels} />
+        <Sidebar
+          onAddChannel={handleAddChannel}
+          channels={channels}
+          setChannels={setChannels}
+        />
+
         <Workspace />
       </div>
 

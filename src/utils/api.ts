@@ -39,6 +39,7 @@ interface Message {
 interface UsersChannnel {
   id: number;
   name: string;
+  data: any;
 }
 
 export const registerUser = async (registrationData: RegistrationData) => {
@@ -138,6 +139,38 @@ export const createChannel = async (channelData: ChannelData) => {
       headers: getAuthHeaders(),
     });
     return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+export const getAndStoreChannels = async () => {
+  try {
+    const channels = await getUsersChannel(); // channels is already response.data
+
+    const currentUser = localStorage.getItem("currentUser"); // assuming that you're storing the current user's ID or name in localStorage under "currentUser"
+
+    // Check if the currentUser has any channels stored in localStorage
+    if (localStorage.getItem(`${currentUser}.channelLists`)) {
+      const oldChannels = JSON.parse(
+        localStorage.getItem(`${currentUser}.channelLists`) || "[]"
+      );
+
+      // Merge old and new channels. Note: This may create duplicates
+      const mergedChannels = [...oldChannels, ...channels];
+
+      // Save the updated list to localStorage
+      localStorage.setItem(
+        `${currentUser}.channelLists`,
+        JSON.stringify(mergedChannels)
+      );
+    } else {
+      // If there's no previous data, just store the channels
+      localStorage.setItem(
+        `${currentUser}.channelLists`,
+        JSON.stringify(channels)
+      );
+    }
   } catch (error) {
     console.error(error);
     throw error;
