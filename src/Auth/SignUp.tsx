@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useState} from "react";
 import Modal from "./Modal";
 import RegistrationFormFields from "./RegistrationFormFields";
 
@@ -24,7 +24,6 @@ export const SignUp = () => {
     setSuccessMessage(successMessage);
     setErrorMessage(errorMessage);
   };
-  
 
   return (
     <>
