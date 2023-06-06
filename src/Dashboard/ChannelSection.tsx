@@ -1,11 +1,33 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import ChannelItem from "./ChannelItem";
 
 interface ChannelSectionProps {
   onAddChannel: () => void;
+  channels: Array<{id: string; name: string}>;
+  setChannels: React.Dispatch<
+    React.SetStateAction<Array<{id: string; name: string}>>
+  >;
+  setSelectedChannel: React.Dispatch<React.SetStateAction<string | null>>;
+  handleDeleteChannel: (id: string) => void;
 }
 
-const ChannelSection: React.FC<ChannelSectionProps> = ({onAddChannel}) => {
+const ChannelSection: React.FC<ChannelSectionProps> = ({
+  onAddChannel,
+  channels,
+  setChannels,
+  setSelectedChannel,
+  handleDeleteChannel,
+}) => {
+  useEffect(() => {
+    const currentUser = localStorage.getItem("currentUser");
+    if (currentUser) {
+      const storedChannels = JSON.parse(
+        localStorage.getItem(`${currentUser}.channelLists`) || "[]"
+      );
+      setChannels(storedChannels);
+    }
+  }, [setChannels]);
+
   return (
     <div>
       <div className="px-5 py-3 flex justify-between items-center">
@@ -22,13 +44,23 @@ const ChannelSection: React.FC<ChannelSectionProps> = ({onAddChannel}) => {
             xmlns="http://www.w3.org/2000/svg"
           >
             <path
+              fillRule="evenodd"
               d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+              clipRule="evenodd"
             ></path>
           </svg>
         </button>
       </div>
-      <ChannelItem />
-      <ChannelItem />
+
+      {channels.filter(Boolean).map((channel: {id: string; name: string}) => (
+        <ChannelItem
+          key={channel.id}
+          id={channel.id}
+          name={channel.name}
+          setSelectedChannel={setSelectedChannel}
+          handleDeleteChannel={handleDeleteChannel}
+        />
+      ))}
     </div>
   );
 };
