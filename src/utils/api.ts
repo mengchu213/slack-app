@@ -16,10 +16,12 @@ interface LoginData {
 }
 
 interface UserList {
-  id: number;
+  id: any;
   email: string;
   data?: object;
   uid?: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface UsersChannnel {

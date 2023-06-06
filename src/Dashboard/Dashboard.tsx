@@ -23,6 +23,10 @@ const Dashboard = () => {
     setShowNewDirectMessage(true);
   };
 
+  const handleHideDirectMessageModal = () => {
+    setShowNewDirectMessage(false);
+  }
+
   const handleLogout = () => {
     localStorage.removeItem('auth');
     localStorage.removeItem('currentUser');
@@ -39,7 +43,6 @@ const Dashboard = () => {
   }, []);
 
   return (
-
     <div className="flex flex-col h-screen">
       <button className="absolute top-10 right-0 m-4 p-2 bg-gray-300 rounded-md" onClick={handleLogout}>
         Logout
@@ -56,8 +59,8 @@ const Dashboard = () => {
         </Modal>
       )}
       {showNewDirectMessage && (
-        <Modal onClose={() => setShowNewDirectMessage(false)}>
-          <NewDirectMessageForm />
+        <Modal onClose={handleHideDirectMessageModal}>
+          <NewDirectMessageForm onHideModal={handleHideDirectMessageModal} />
         </Modal>
       )}
       {showUserProfile && (
