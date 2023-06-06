@@ -15,6 +15,14 @@ interface LoginData {
 }
 
 interface User {
+  id: number;
+  email: string;
+  uid: string;
+  created_at: string;
+  updated_at: string;
+}
+
+interface UserLists {
   id: any;
   email: string;
   data?: object;
@@ -56,6 +64,7 @@ export const registerUser = async (registrationData: RegistrationData) => {
 export const loginUser = async (loginData: LoginData) => {
   try {
     const response = await axios.post(`${API_URL}/auth/sign_in`, loginData);
+
     localStorage.setItem("access-token", response.headers["access-token"]);
     localStorage.setItem("client", response.headers["client"]);
     localStorage.setItem("expiry", response.headers["expiry"]);
@@ -77,10 +86,30 @@ export const getAuthHeaders = () => {
   };
 };
 
-export const getUsers = async (headers: any): Promise<{uid: string; data: User[]}> => {
+export const getUsers = async (): Promise<{uid: string; data: User[]}> => {
   try {
     const response = await axios.get(`${API_URL}/users`, {
       headers: getAuthHeaders(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const getUserss = async (headers: any): Promise<{ uid: string, data: UserLists[] }> => {
+  const authData = JSON.parse(localStorage.getItem("auth") || "{}");
+  const { "access-token": accessToken, client, expiry, uid } = authData;
+
+  try {
+    const response = await axios.get(`${API_URL}/users`, {
+      headers: {
+        "access-token": accessToken,
+        client: client,
+        expiry: expiry,
+        uid: uid
+      }
     });
     return response.data;
   } catch (error) {
@@ -103,7 +132,8 @@ export const getUsersChannel = async (): Promise<UsersChannnel[]> => {
 
 export const getMessages = async (
   receiverId: number,
-  receiverClass: string
+  receiverClass: string,
+  headers?: any
 ): Promise<{data: Message[]}> => {
   try {
     const response = await axios.get(`${API_URL}/messages`, {
@@ -111,7 +141,7 @@ export const getMessages = async (
         receiver_id: receiverId,
         receiver_class: receiverClass,
       },
-      headers: getAuthHeaders(),
+      headers: headers || getAuthHeaders(),
     });
     return response.data;
   } catch (error) {
@@ -145,10 +175,9 @@ export const createChannel = async (channelData: ChannelData) => {
 };
 export const getAndStoreChannels = async () => {
   try {
-    const channels = await getUsersChannel(); 
+    const channels = await getUsersChannel();
 
-    const currentUser = localStorage.getItem("currentUser"); 
-
+    const currentUser = localStorage.getItem("currentUser");
 
     if (localStorage.getItem(`${currentUser}.channelLists`)) {
       const oldChannels = JSON.parse(

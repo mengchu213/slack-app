@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { loginUser, getUsers, getMessages } from "../utils/api";
+import { loginUser, getUserss, getMessages } from "../utils/api";
 import { useNavigate } from "react-router-dom";
 
 interface LoginFormData {
@@ -31,7 +31,7 @@ export const LoginForm = () => {
       setSuccessMessage("Login successful");
       localStorage.setItem("auth", JSON.stringify(headers));
       const email = formData.email;
-      const userListResponse = await getUsers(headers);
+      const userListResponse = await getUserss({});
       const userList = userListResponse.data;
       const messages: any[] = [];
       const maxConcurrentRequests = 100;

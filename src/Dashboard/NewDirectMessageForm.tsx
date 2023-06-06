@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
-import { getUsers } from "../utils/api";
+import { getUserss } from "../utils/api";
 
 interface NewDirectMessageFormProps {
   onHideModal: () => void;
@@ -54,11 +54,17 @@ const NewDirectMessageForm: React.FC<NewDirectMessageFormProps> = ({ onHideModal
 
   useEffect(() => {
     const fetchUsers = async () => {
+      const authData = JSON.parse(localStorage.getItem("auth") || "{}");
+      const { "access-token": accessToken, client, expiry, uid } = authData;
+  
       try {
-        const headers = {
-          Authorization: `Bearer ${localStorage.getItem("access-token")}`,
-        };
-        const response = await getUsers(headers);
+        const response = await getUserss({
+          "access-token": accessToken,
+          client: client,
+          expiry: expiry,
+          uid: uid
+        });
+        
         const users = response.data;
         setUsers(users);
       } catch (error) {
@@ -66,6 +72,7 @@ const NewDirectMessageForm: React.FC<NewDirectMessageFormProps> = ({ onHideModal
         setErrorMessage("Failed to fetch users");
       }
     };
+  
     fetchUsers();
   }, []);
 

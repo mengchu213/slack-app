@@ -7,7 +7,7 @@ import NewChannelForm from "./NewChannelForm";
 import NewDirectMessageForm from "./NewDirectMessageForm";
 import UserProfile from "./UserProfile";
 import {useNavigate} from "react-router-dom";
-import {Dispatch, SetStateAction} from "react";
+
 
 interface DashboardProps {
   channels: Array<{id: string; name: string}>;
@@ -28,6 +28,10 @@ const Dashboard: React.FC<DashboardProps> = () => {
 
   const handleAddChannel = () => {
     setShowNewChannel(true);
+  };
+
+  const handleAddUser = () => {
+    setShowNewDirectMessage(true);
   };
 
   const handleDeleteChannel = (id: string) => {
@@ -69,6 +73,15 @@ const Dashboard: React.FC<DashboardProps> = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const { "access-token": accessToken, client, expiry, uid } = JSON.parse(localStorage.getItem("auth") || "{}");
+    if (!accessToken && !client && !expiry && !uid) {
+      setTimeout(() => {
+        navigate("/");
+      }, 10);
+    }
+  }, []);
+
   return (
     <div className="flex flex-col h-screen">
       <button
@@ -85,6 +98,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
           setChannels={setChannels}
           setSelectedChannel={setSelectedChannel}
           handleDeleteChannel={handleDeleteChannel}
+          onAddUser = {handleAddUser}
         />
 
         <Workspace selectedChannel={selectedChannel} />
