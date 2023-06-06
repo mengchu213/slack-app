@@ -1,5 +1,5 @@
-import React, {useState} from "react";
-import {registerUser} from "../utils/api";
+import React, { useState } from "react";
+import { registerUser } from "../utils/api";
 
 export interface RegistrationFormFields {
   email: string;
@@ -13,11 +13,7 @@ interface Props {
   setSuccessMessage: (successMessage: string) => void;
 }
 
-export const RegistrationFormFields = ({
-  setModalOpen,
-  setErrorMessage,
-  setSuccessMessage,
-}: Props) => {
+export const RegistrationFormFields = ({ setModalOpen, setErrorMessage, setSuccessMessage }: Props) => {
   const [formData, setFormData] = useState<RegistrationFormFields>({
     email: "",
     password: "",
@@ -25,8 +21,8 @@ export const RegistrationFormFields = ({
   });
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = event.target;
-    setFormData((prevFormData) => ({...prevFormData, [name]: value}));
+    const { name, value } = event.target;
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -35,14 +31,14 @@ export const RegistrationFormFields = ({
     setErrorMessage("");
     try {
       await registerUser(formData);
-      setSuccessMessage("Sign up successful. Please log in to continue.");
-      setTimeout(() => {
-        setModalOpen(false);
-      }, 2000);
+      setSuccessMessage(
+        "Sign up successful. Please log in to continue."
+      );
     } catch (error) {
       console.error(error);
       setErrorMessage("Failed to register user");
     }
+    setTimeout(() => {setModalOpen(false);}, 2000);
   };
 
   return (

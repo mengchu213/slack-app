@@ -30,13 +30,15 @@ export const LoginForm = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setSuccessMessage("");
+    setErrorMessage("");
     try {
       const {headers} = await loginUser(formData);
       localStorage.setItem("auth", JSON.stringify(headers));
       localStorage.setItem("currentUserEmail", formData.email);
 
       const email = formData.email;
-      const userListResponse = await getUsers();
+      const userListResponse = await getUsers(headers);
       const userList = userListResponse.data;
       const matchingUser = userList.find((user) => user.uid === email);
       let receiverId = null;
