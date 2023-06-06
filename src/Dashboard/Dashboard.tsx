@@ -12,9 +12,12 @@ import {Dispatch, SetStateAction} from "react";
 interface DashboardProps {
   channels: Array<{id: string; name: string}>;
   setChannels: React.Dispatch<React.SetStateAction<any[]>>;
-  setSelectedChannel: React.Dispatch<React.SetStateAction<string | null>>;
-  selectedChannel: string | null;
+  setSelectedChannel: React.Dispatch<
+    React.SetStateAction<{id: number; name: string} | null>
+  >;
+  selectedChannel: {id: number; name: string} | null;
 }
+
 const Dashboard: React.FC<DashboardProps> = () => {
   const [channels, setChannels] = useState<Array<{id: string; name: string}>>(
     []
@@ -22,7 +25,10 @@ const Dashboard: React.FC<DashboardProps> = () => {
   const [showNewChannel, setShowNewChannel] = useState(false);
   const [showNewDirectMessage, setShowNewDirectMessage] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
-  const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
+  const [selectedChannel, setSelectedChannel] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
 
   const navigate = useNavigate();
 
@@ -83,7 +89,10 @@ const Dashboard: React.FC<DashboardProps> = () => {
           handleDeleteChannel={handleDeleteChannel}
         />
 
-        <Workspace selectedChannel={selectedChannel} />
+        <Workspace
+          selectedChannel={selectedChannel ? selectedChannel.id : null}
+          selectedChannelName={selectedChannel ? selectedChannel.name : null}
+        />
       </div>
 
       {showNewChannel && (

@@ -7,7 +7,9 @@ interface SidebarProps {
   setChannels: React.Dispatch<
     React.SetStateAction<Array<{id: string; name: string}>>
   >;
-  setSelectedChannel: React.Dispatch<React.SetStateAction<string | null>>;
+  setSelectedChannel: React.Dispatch<
+    React.SetStateAction<{id: number; name: string} | null>
+  >;
   handleDeleteChannel: (id: string) => void;
 }
 

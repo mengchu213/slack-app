@@ -1,17 +1,70 @@
 import React, {useState} from "react";
+import axios from "axios";
 
-const MessageInput = () => {
+interface MessageInputProps {
+  addMessage: (message: {id: number; text: string; sender: string}) => void;
+  selectedChannel: number | null;
+}
+
+const MessageInput: React.FC<MessageInputProps> = ({
+  addMessage,
+  selectedChannel,
+}) => {
   const [message, setMessage] = useState("");
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(event.target.value);
   };
 
-  const handleFormSubmit = (event: React.FormEvent) => {
+  const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    console.log("Send message:", message);
-    setMessage("");
-    //send the message to your backend.
+
+    if (!selectedChannel) {
+      return;
+    }
+
+    const newMessage = {
+      receiver_id: selectedChannel, // it's a number now
+      receiver_class: "Channel",
+      body: message,
+    };
+
+    const headers = {
+      "access-token": localStorage.getItem("access-token"),
+      client: localStorage.getItem("client"),
+      expiry: localStorage.getItem("expiry"),
+      uid: localStorage.getItem("uid"),
+    };
+
+    try {
+      const response = await axios.post(
+        "http://206.189.91.54/api/v1/messages",
+        newMessage,
+        {headers}
+      );
+      if (response.data.errors) {
+        console.log("API errors:", response.data.errors);
+      }
+      console.log("API response:", response);
+      const sender = localStorage.getItem("email");
+
+      if (response.status === 200 && sender) {
+        console.log("Calling addMessage with:", {
+          // And this line
+          id: response.data.id,
+          text: response.data.body,
+          sender: sender,
+        });
+        addMessage({
+          id: response.data.id,
+          text: response.data.body,
+          sender: sender,
+        });
+        setMessage("");
+      }
+    } catch (error) {
+      console.error("Failed to post message:", error);
+    }
   };
 
   return (

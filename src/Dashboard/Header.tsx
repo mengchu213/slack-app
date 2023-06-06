@@ -1,9 +1,17 @@
-// Header.tsx
-import React from "react";
+import React, {useEffect, useState} from "react";
 import SearchBar from "./SearchBar";
 import {ReactComponent as Logo} from "../assets/logo.svg";
 
 const Header: React.FC = () => {
+  const [currentUserEmail, setCurrentUserEmail] = useState("");
+
+  useEffect(() => {
+    const email = localStorage.getItem("currentUserEmail");
+    if (email) {
+      setCurrentUserEmail(email);
+    }
+  }, []);
+
   return (
     <header className="flex justify-between items-center bg-gray-800 px-4 py-2 border-b border-gray-200">
       <div className="header__left">
@@ -13,7 +21,7 @@ const Header: React.FC = () => {
         <SearchBar />
       </div>
       <div className="header__right">
-        <p className="text-white">Michael Langdon</p>
+        <p className="text-white">{currentUserEmail || "Guest"}</p>
       </div>
     </header>
   );

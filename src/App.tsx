@@ -5,6 +5,7 @@ import Dashboard from "./Dashboard/Dashboard";
 
 const App = () => {
   const [channels, setChannels] = useState<any[]>([]);
+  const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
 
   return (
     <Router>
@@ -12,7 +13,14 @@ const App = () => {
         <Route path="/" element={<AuthForm />} />
         <Route
           path="/dashboard"
-          element={<Dashboard channels={channels} setChannels={setChannels} />}
+          element={
+            <Dashboard
+              channels={channels}
+              setChannels={setChannels}
+              selectedChannel={selectedChannel}
+              setSelectedChannel={setSelectedChannel}
+            />
+          }
         />
       </Routes>
     </Router>

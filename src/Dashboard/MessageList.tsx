@@ -1,17 +1,16 @@
 import MessageItem from "./MessageItem";
 
-const MessageList = () => {
-  // This data comes from backend.
-  const messages = [
-    {id: 1, text: "Hello, world!", sender: "User1"},
-    {id: 2, text: "Hello, everyone!", sender: "User2"},
-  ];
+interface MessageListProps {
+  messages: Array<{id: number; text: string; sender: string}>;
+}
 
+const MessageList: React.FC<MessageListProps> = ({messages}) => {
   return (
     <ul className="flex-grow overflow-auto">
-      {messages.map((message) => (
-        <MessageItem key={message.id} message={message} />
-      ))}
+      {Array.isArray(messages) &&
+        messages.map((message) => (
+          <MessageItem key={message.id} message={message} />
+        ))}
     </ul>
   );
 };

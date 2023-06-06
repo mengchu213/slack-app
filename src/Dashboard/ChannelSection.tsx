@@ -7,7 +7,9 @@ interface ChannelSectionProps {
   setChannels: React.Dispatch<
     React.SetStateAction<Array<{id: string; name: string}>>
   >;
-  setSelectedChannel: React.Dispatch<React.SetStateAction<string | null>>;
+  setSelectedChannel: React.Dispatch<
+    React.SetStateAction<{id: number; name: string} | null>
+  >;
   handleDeleteChannel: (id: string) => void;
 }
 
@@ -57,7 +59,7 @@ const ChannelSection: React.FC<ChannelSectionProps> = ({
           key={channel.id}
           id={channel.id}
           name={channel.name}
-          setSelectedChannel={setSelectedChannel}
+          setSelectedChannel={setSelectedChannel} // Note the change here
           handleDeleteChannel={handleDeleteChannel}
         />
       ))}

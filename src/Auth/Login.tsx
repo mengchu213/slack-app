@@ -7,6 +7,13 @@ interface LoginFormData {
   password: string;
 }
 
+interface AuthData {
+  "access-token"?: string;
+  client?: string;
+  expiry?: string;
+  uid?: string;
+}
+
 export const LoginForm = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState<LoginFormData>({
@@ -24,47 +31,31 @@ export const LoginForm = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      const headers = await loginUser(formData);
-      console.log(headers);
+      const {headers} = await loginUser(formData);
       localStorage.setItem("auth", JSON.stringify(headers));
+      localStorage.setItem("currentUserEmail", formData.email);
+
       const email = formData.email;
       const userListResponse = await getUsers();
       const userList = userListResponse.data;
-      const messages: any[] = [];
-      const maxConcurrentRequests = 100;
-      let promisePool = [];
-      let receiverId;
-      JSON.parse(localStorage.getItem("auth") || "{}");
+      const matchingUser = userList.find((user) => user.uid === email);
+      let receiverId = null;
+      if (matchingUser) {
+        receiverId = matchingUser.id;
+        localStorage.setItem("currentUser", JSON.stringify(receiverId));
+      }
+
+      if (receiverId !== null) {
+        const messages = await getMessages(receiverId, "User");
+        localStorage.setItem("currentUserMessages", JSON.stringify(messages));
+      } else {
+        throw new Error("User ID not found");
+      }
+
       setSuccessMessage("Login successful");
       setTimeout(() => {
         navigate("/dashboard");
       }, 2000);
-      const matchingUser = userList.find((user) => user.uid === email);
-      if (matchingUser) {
-        const receiverId = matchingUser.id;
-        localStorage.setItem("currentUser", JSON.stringify(receiverId));
-      }
-      for (let current = 0; current < userList.length; current++) {
-        if (userList[current].id !== receiverId) {
-          const promise = getMessages(userList[current].id, "User");
-          promisePool.push(promise);
-
-          if (
-            promisePool.length >= maxConcurrentRequests ||
-            current === userList.length - 1
-          ) {
-            const messagesResponse = await Promise.all(promisePool);
-            messages.push(...messagesResponse);
-
-            promisePool = [];
-          }
-        }
-      }
-      const filteredMessages = messages.filter((item) => item.data.length > 0);
-      localStorage.setItem(
-        localStorage.currentUser,
-        JSON.stringify(filteredMessages)
-      );
     } catch (error) {
       console.error(error);
       setErrorMessage("Invalid email or password");
@@ -72,12 +63,24 @@ export const LoginForm = () => {
   };
 
   useEffect(() => {
-    const {
-      "access-token": accessToken,
-      client,
-      expiry,
-      uid,
-    } = JSON.parse(localStorage.getItem("auth") || "{}");
+    console.log("Checking localStorage:", localStorage.getItem("auth")); // Add this
+    const authData = localStorage.getItem("auth");
+    let auth: AuthData = {};
+
+    if (authData) {
+      try {
+        auth = JSON.parse(authData);
+      } catch (e) {
+        console.error("Error parsing auth data from localStorage:", e);
+        // Set default value here
+        auth = {};
+      }
+    } else {
+      console.warn("No auth data in localStorage");
+      return;
+    }
+
+    const {"access-token": accessToken, client, expiry, uid} = auth;
     if (accessToken && client && expiry && uid) {
       setTimeout(() => {
         navigate("/dashboard");

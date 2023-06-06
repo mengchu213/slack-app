@@ -3,7 +3,9 @@ import React, {useState, useEffect, useRef} from "react";
 interface ChannelItemProps {
   id: string;
   name: string;
-  setSelectedChannel: React.Dispatch<React.SetStateAction<string | null>>;
+  setSelectedChannel: React.Dispatch<
+    React.SetStateAction<{id: number; name: string} | null>
+  >;
   handleDeleteChannel: (id: string) => void;
 }
 
@@ -18,10 +20,8 @@ const ChannelItem: React.FC<ChannelItemProps> = ({
 
   const handleClickOutside = (e: MouseEvent) => {
     if (node.current?.contains(e.target as Node)) {
-      // inside click
       return;
     }
-    // outside click
     setIsOpen(false);
   };
 
@@ -36,7 +36,7 @@ const ChannelItem: React.FC<ChannelItemProps> = ({
     <div
       ref={node}
       className="flex justify-between items-center px-5 py-2 cursor-pointer hover:bg-gray-700"
-      onClick={() => setSelectedChannel(name)}
+      onClick={() => setSelectedChannel({id: parseInt(id), name})} // Note the change here
     >
       <h3 className="font-medium text-sm">{name}</h3>
       <div className="relative inline-block text-left">
