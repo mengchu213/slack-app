@@ -48,6 +48,10 @@ const Dashboard: React.FC<DashboardProps> = () => {
     }
   };
 
+  const handleHideDirectMessageModal = () => {
+    setShowNewDirectMessage(false);
+  }
+
   const handleLogout = () => {
     localStorage.removeItem("auth");
     localStorage.removeItem("currentUser");
@@ -92,8 +96,8 @@ const Dashboard: React.FC<DashboardProps> = () => {
         </Modal>
       )}
       {showNewDirectMessage && (
-        <Modal onClose={() => setShowNewDirectMessage(false)}>
-          <NewDirectMessageForm />
+        <Modal onClose={handleHideDirectMessageModal}>
+          <NewDirectMessageForm onHideModal={handleHideDirectMessageModal} />
         </Modal>
       )}
       {showUserProfile && (

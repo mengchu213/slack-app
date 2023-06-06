@@ -14,10 +14,11 @@ interface LoginData {
   password: string;
 }
 
-interface User {
-  id: number;
+interface UserList {
+  id: any;
   email: string;
-  uid: string;
+  data?: object;
+  uid?: string;
   created_at: string;
   updated_at: string;
 }

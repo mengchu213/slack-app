@@ -28,6 +28,7 @@ export const LoginForm = () => {
     try {
       const headers = await loginUser(formData);
       console.log(headers);
+      setSuccessMessage("Login successful");
       localStorage.setItem("auth", JSON.stringify(headers));
       const email = formData.email;
       const userListResponse = await getUsers(headers);
@@ -37,10 +38,7 @@ export const LoginForm = () => {
       let promisePool = [];
       let receiverId;
       JSON.parse(localStorage.getItem("auth") || "{}");
-      setSuccessMessage("Login successful");
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 2000);
+      navigate("/dashboard");
       const matchingUser = userList.find(user => user.uid === email);
       if (matchingUser) {
         const receiverId = matchingUser.id;
