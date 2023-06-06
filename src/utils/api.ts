@@ -14,7 +14,7 @@ interface LoginData {
   password: string;
 }
 
-interface UserList {
+interface User {
   id: any;
   email: string;
   data?: object;
@@ -56,8 +56,6 @@ export const registerUser = async (registrationData: RegistrationData) => {
 export const loginUser = async (loginData: LoginData) => {
   try {
     const response = await axios.post(`${API_URL}/auth/sign_in`, loginData);
-
-    // save these headers in localStorage
     localStorage.setItem("access-token", response.headers["access-token"]);
     localStorage.setItem("client", response.headers["client"]);
     localStorage.setItem("expiry", response.headers["expiry"]);
@@ -79,7 +77,7 @@ export const getAuthHeaders = () => {
   };
 };
 
-export const getUsers = async (): Promise<{uid: string; data: User[]}> => {
+export const getUsers = async (headers: any): Promise<{uid: string; data: User[]}> => {
   try {
     const response = await axios.get(`${API_URL}/users`, {
       headers: getAuthHeaders(),
@@ -147,26 +145,23 @@ export const createChannel = async (channelData: ChannelData) => {
 };
 export const getAndStoreChannels = async () => {
   try {
-    const channels = await getUsersChannel(); // channels is already response.data
+    const channels = await getUsersChannel(); 
 
-    const currentUser = localStorage.getItem("currentUser"); // assuming that you're storing the current user's ID or name in localStorage under "currentUser"
+    const currentUser = localStorage.getItem("currentUser"); 
 
-    // Check if the currentUser has any channels stored in localStorage
+
     if (localStorage.getItem(`${currentUser}.channelLists`)) {
       const oldChannels = JSON.parse(
         localStorage.getItem(`${currentUser}.channelLists`) || "[]"
       );
 
-      // Merge old and new channels. Note: This may create duplicates
       const mergedChannels = [...oldChannels, ...channels];
 
-      // Save the updated list to localStorage
       localStorage.setItem(
         `${currentUser}.channelLists`,
         JSON.stringify(mergedChannels)
       );
     } else {
-      // If there's no previous data, just store the channels
       localStorage.setItem(
         `${currentUser}.channelLists`,
         JSON.stringify(channels)
