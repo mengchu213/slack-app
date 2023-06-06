@@ -6,27 +6,26 @@ import axios from "axios";
 interface WorkspaceProps {
   selectedChannel: number | null;
   selectedChannelName: string | null;
+  messages: Array<{id: number; text: string; sender: string}>;
+  addMessage: (
+    channelId: number,
+    message: {id: number; text: string; sender: string}
+  ) => void;
 }
 
 const Workspace: React.FC<WorkspaceProps> = ({
   selectedChannel,
   selectedChannelName,
+  messages,
+  addMessage,
 }) => {
-  const [messages, setMessages] = useState<
-    {id: number; text: string; sender: string}[]
-  >([]);
-
-  const addMessage = (message: {id: number; text: string; sender: string}) =>
-    setMessages([...messages, message]);
-
   useEffect(() => {
-    console.log(messages); // console log for debugging
+    console.log(messages);
   }, [messages]);
 
   useEffect(() => {
     const fetchMessages = async () => {
       if (!selectedChannel) {
-        setMessages([]);
         return;
       }
 
@@ -44,23 +43,31 @@ const Workspace: React.FC<WorkspaceProps> = ({
         );
 
         if (response.status === 200) {
-          setMessages(
-            response.data.map((message: any) => ({
+          if (Array.isArray(response.data)) {
+            const fetchedMessages = response.data.map((message: any) => ({
               id: message.id,
               text: message.body,
               sender: message.sender,
-            }))
-          );
-        } else {
-          setMessages([]);
+            }));
+            console.log("fetchedMessages:", fetchedMessages);
+
+            // Removed duplicate forEach loop
+            if (selectedChannel) {
+              fetchedMessages.forEach((message) => {
+                addMessage(selectedChannel, message);
+              });
+            }
+          } else {
+            console.log("Unexpected data structure", response.data);
+          }
         }
       } catch (err) {
-        setMessages([]);
+        console.error(err);
       }
     };
 
     fetchMessages();
-  }, [selectedChannel]);
+  }, [selectedChannel, addMessage]);
 
   return (
     <div className="flex flex-col flex-grow bg-gray-700">

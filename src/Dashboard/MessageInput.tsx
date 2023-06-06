@@ -1,8 +1,11 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import axios from "axios";
 
 interface MessageInputProps {
-  addMessage: (message: {id: number; text: string; sender: string}) => void;
+  addMessage: (
+    channelId: number,
+    message: {id: number; text: string; sender: string}
+  ) => void;
   selectedChannel: number | null;
 }
 
@@ -16,6 +19,46 @@ const MessageInput: React.FC<MessageInputProps> = ({
     setMessage(event.target.value);
   };
 
+  const fetchMessages = async () => {
+    if (!selectedChannel) {
+      return;
+    }
+
+    const headers = {
+      "access-token": localStorage.getItem("access-token"),
+      client: localStorage.getItem("client"),
+      expiry: localStorage.getItem("expiry"),
+      uid: localStorage.getItem("uid"),
+    };
+
+    try {
+      const response = await axios.get(
+        `http://206.189.91.54/api/v1/messages?receiver_id=${selectedChannel}&receiver_class=Channel`,
+        {headers}
+      );
+
+      if (response.status === 200) {
+        if (Array.isArray(response.data)) {
+          const fetchedMessages = response.data.map((message: any) => ({
+            id: message.id,
+            text: message.body,
+            sender: message.sender,
+          }));
+
+          if (selectedChannel) {
+            fetchedMessages.forEach((message) => {
+              addMessage(selectedChannel, message);
+            });
+          }
+        } else {
+          console.log("Unexpected data structure", response.data);
+        }
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
@@ -24,7 +67,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
     }
 
     const newMessage = {
-      receiver_id: selectedChannel, // it's a number now
+      receiver_id: selectedChannel,
       receiver_class: "Channel",
       body: message,
     };
@@ -49,18 +92,13 @@ const MessageInput: React.FC<MessageInputProps> = ({
       const sender = localStorage.getItem("email");
 
       if (response.status === 200 && sender) {
-        console.log("Calling addMessage with:", {
-          // And this line
-          id: response.data.id,
-          text: response.data.body,
-          sender: sender,
-        });
-        addMessage({
-          id: response.data.id,
-          text: response.data.body,
+        addMessage(selectedChannel, {
+          id: response.data.data.id,
+          text: response.data.data.body,
           sender: sender,
         });
         setMessage("");
+        await fetchMessages();
       }
     } catch (error) {
       console.error("Failed to post message:", error);

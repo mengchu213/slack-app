@@ -7,28 +7,34 @@ import NewChannelForm from "./NewChannelForm";
 import NewDirectMessageForm from "./NewDirectMessageForm";
 import UserProfile from "./UserProfile";
 import {useNavigate} from "react-router-dom";
-import {Dispatch, SetStateAction} from "react";
 
 interface DashboardProps {
   channels: Array<{id: string; name: string}>;
-  setChannels: React.Dispatch<React.SetStateAction<any[]>>;
+  setChannels: React.Dispatch<
+    React.SetStateAction<{id: string; name: string}[]>
+  >;
+  selectedChannel: {id: number; name: string} | null;
   setSelectedChannel: React.Dispatch<
     React.SetStateAction<{id: number; name: string} | null>
   >;
-  selectedChannel: {id: number; name: string} | null;
+  messages: Record<number, Array<{id: number; text: string; sender: string}>>;
+  addMessage: (
+    channelId: number,
+    message: {id: number; text: string; sender: string}
+  ) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = () => {
-  const [channels, setChannels] = useState<Array<{id: string; name: string}>>(
-    []
-  );
+const Dashboard: React.FC<DashboardProps> = ({
+  channels,
+  setChannels,
+  selectedChannel,
+  setSelectedChannel,
+  messages,
+  addMessage,
+}) => {
   const [showNewChannel, setShowNewChannel] = useState(false);
   const [showNewDirectMessage, setShowNewDirectMessage] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
-  const [selectedChannel, setSelectedChannel] = useState<{
-    id: number;
-    name: string;
-  } | null>(null);
 
   const navigate = useNavigate();
 
@@ -82,34 +88,43 @@ const Dashboard: React.FC<DashboardProps> = () => {
       <Header />
       <div className="flex flex-grow">
         <Sidebar
-          onAddChannel={handleAddChannel}
           channels={channels}
-          setChannels={setChannels}
-          setSelectedChannel={setSelectedChannel}
+          onAddChannel={handleAddChannel}
           handleDeleteChannel={handleDeleteChannel}
+          setSelectedChannel={setSelectedChannel}
+          setChannels={setChannels}
         />
 
         <Workspace
           selectedChannel={selectedChannel ? selectedChannel.id : null}
           selectedChannelName={selectedChannel ? selectedChannel.name : null}
+          messages={selectedChannel ? messages[selectedChannel.id] || [] : []}
+          addMessage={(
+            channelId: number,
+            message: {id: number; text: string; sender: string}
+          ) => {
+            if (selectedChannel) {
+              addMessage(channelId, message);
+            }
+          }}
         />
-      </div>
 
-      {showNewChannel && (
-        <Modal onClose={() => setShowNewChannel(false)}>
-          <NewChannelForm setChannels={setChannels} />
-        </Modal>
-      )}
-      {showNewDirectMessage && (
-        <Modal onClose={() => setShowNewDirectMessage(false)}>
-          <NewDirectMessageForm />
-        </Modal>
-      )}
-      {showUserProfile && (
-        <Modal onClose={() => setShowUserProfile(false)}>
-          <UserProfile name="User Name" email="user@example.com" userId={0} />
-        </Modal>
-      )}
+        {showNewChannel && (
+          <Modal onClose={() => setShowNewChannel(false)}>
+            <NewChannelForm setChannels={setChannels} />
+          </Modal>
+        )}
+        {showNewDirectMessage && (
+          <Modal onClose={() => setShowNewDirectMessage(false)}>
+            <NewDirectMessageForm />
+          </Modal>
+        )}
+        {showUserProfile && (
+          <Modal onClose={() => setShowUserProfile(false)}>
+            <UserProfile name="User Name" email="user@example.com" userId={0} />
+          </Modal>
+        )}
+      </div>
     </div>
   );
 };

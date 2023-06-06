@@ -50,7 +50,6 @@ const NewChannelForm = ({setChannels}: NewChannelFormProps) => {
       const newChannel = response.data;
       setChannels((prevChannels) => [...prevChannels, newChannel]);
 
-      // Get the list of channels from localStorage, add the new channel to it, and save it back to localStorage
       const currentUser = localStorage.getItem("currentUser");
       const storedChannels = JSON.parse(
         localStorage.getItem(`${currentUser}.channelLists`) || "[]"

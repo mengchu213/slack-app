@@ -36,7 +36,7 @@ const ChannelItem: React.FC<ChannelItemProps> = ({
     <div
       ref={node}
       className="flex justify-between items-center px-5 py-2 cursor-pointer hover:bg-gray-700"
-      onClick={() => setSelectedChannel({id: parseInt(id), name})} // Note the change here
+      onClick={() => setSelectedChannel({id: parseInt(id), name})}
     >
       <h3 className="font-medium text-sm">{name}</h3>
       <div className="relative inline-block text-left">

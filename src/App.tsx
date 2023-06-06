@@ -5,7 +5,23 @@ import Dashboard from "./Dashboard/Dashboard";
 
 const App = () => {
   const [channels, setChannels] = useState<any[]>([]);
-  const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
+  const [selectedChannel, setSelectedChannel] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
+  const [messages, setMessages] = useState<
+    Record<number, Array<{id: number; text: string; sender: string}>>
+  >({});
+
+  const addMessage = (
+    channelId: number,
+    message: {id: number; text: string; sender: string}
+  ) => {
+    setMessages((prevMessages) => ({
+      ...prevMessages,
+      [channelId]: [...(prevMessages[channelId] || []), message],
+    }));
+  };
 
   return (
     <Router>
@@ -19,6 +35,8 @@ const App = () => {
               setChannels={setChannels}
               selectedChannel={selectedChannel}
               setSelectedChannel={setSelectedChannel}
+              messages={messages}
+              addMessage={addMessage}
             />
           }
         />

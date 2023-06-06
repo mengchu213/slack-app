@@ -63,7 +63,7 @@ export const LoginForm = () => {
   };
 
   useEffect(() => {
-    console.log("Checking localStorage:", localStorage.getItem("auth")); // Add this
+    console.log("Checking localStorage:", localStorage.getItem("auth"));
     const authData = localStorage.getItem("auth");
     let auth: AuthData = {};
 
@@ -72,7 +72,6 @@ export const LoginForm = () => {
         auth = JSON.parse(authData);
       } catch (e) {
         console.error("Error parsing auth data from localStorage:", e);
-        // Set default value here
         auth = {};
       }
     } else {

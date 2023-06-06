@@ -59,7 +59,7 @@ const ChannelSection: React.FC<ChannelSectionProps> = ({
           key={channel.id}
           id={channel.id}
           name={channel.name}
-          setSelectedChannel={setSelectedChannel} // Note the change here
+          setSelectedChannel={setSelectedChannel}
           handleDeleteChannel={handleDeleteChannel}
         />
       ))}
