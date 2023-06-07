@@ -1,15 +1,23 @@
 import { useState } from "react";
+import { getMessages } from "../utils/api";
 
 export const DirectMessageItems = () => {
   const currentUserId: string = localStorage.currentUser || "";
-  const userListsString = localStorage.getItem(`${currentUserId}`) ?? "[]";
-  const userLists = JSON.parse(userListsString);
+  const userListsObject = JSON.parse(localStorage.getItem(currentUserId) || "{}");
+  const userLists = userListsObject.userLists || [];
 
   const [selectedId, setSelectedId] = useState<number | null>(null);
 
-  const handleButtonClick = (id: number) => {
+  const handleButtonClick = async (id: number) => {
     console.log(id);
     setSelectedId(id);
+    try {
+      const response = await getMessages(id, "User");
+      console.log(response);
+      localStorage.setItem("message", JSON.stringify(response.data));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

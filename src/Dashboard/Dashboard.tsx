@@ -59,6 +59,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
   const handleLogout = () => {
     localStorage.removeItem("auth");
     localStorage.removeItem("currentUser");
+    localStorage.removeItem("message");
     setChannels([]);
     navigate("/");
   };
