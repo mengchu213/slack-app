@@ -6,7 +6,7 @@ import axios from "axios";
 interface WorkspaceProps {
   selectedChannel: number | null;
   selectedChannelName: string | null;
-  messages: Array<{id: number; text: string; sender: string}>;
+  messages: Record<number, Array<{id: number; text: string; sender: string}>>;
   addMessage: (
     channelId: number,
     message: {id: number; text: string; sender: string}
@@ -16,9 +16,24 @@ interface WorkspaceProps {
 const Workspace: React.FC<WorkspaceProps> = ({
   selectedChannel,
   selectedChannelName,
-  messages,
-  addMessage,
 }) => {
+  const [messages, setMessages] = useState<{
+    [key: number]: Array<{id: number; text: string; sender: string}>;
+  }>({});
+
+  const addMessage = (
+    channelId: number,
+    message: {id: number; text: string; sender: string}
+  ) => {
+    setMessages((prevMessages) => {
+      const channelMessages = prevMessages[channelId] || [];
+      return {
+        ...prevMessages,
+        [channelId]: [...channelMessages, message],
+      };
+    });
+  };
+
   useEffect(() => {
     console.log(messages);
   }, [messages]);
@@ -51,9 +66,10 @@ const Workspace: React.FC<WorkspaceProps> = ({
             }));
             console.log("fetchedMessages:", fetchedMessages);
 
-            fetchedMessages.forEach((message) => {
-              addMessage(selectedChannel, message);
-            });
+            setMessages((prevMessages) => ({
+              ...prevMessages,
+              [selectedChannel]: fetchedMessages,
+            }));
           } else {
             console.log("Unexpected data structure", response.data);
           }
@@ -64,13 +80,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
     };
 
     fetchMessages();
-  }, [selectedChannel, addMessage]);
-  const handleAddMessage = (
-    channelId: number,
-    message: {id: number; text: string; sender: string}
-  ) => {
-    addMessage(channelId, message);
-  };
+  }, [selectedChannel]);
 
   return (
     <div className="flex flex-col flex-grow bg-gray-700 ">
@@ -80,12 +90,12 @@ const Workspace: React.FC<WorkspaceProps> = ({
           : "No Channel Selected"}
       </div>
 
-      <MessageList messages={messages} />
-
-      <MessageInput
-        addMessage={handleAddMessage}
-        selectedChannel={selectedChannel}
+      <MessageList
+        channelId={selectedChannel}
+        messages={selectedChannel !== null ? messages[selectedChannel] : []}
       />
+
+      <MessageInput addMessage={addMessage} selectedChannel={selectedChannel} />
     </div>
   );
 };

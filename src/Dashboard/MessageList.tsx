@@ -1,42 +1,19 @@
-import React, {useState, useEffect} from "react";
+import {useState, useEffect} from "react";
 import MessageItem from "./MessageItem";
+import axios from "axios";
 
-interface Message {
-  id: number;
-  body: string;
-  created_at: string;
-  sender: string;
+interface MessageListProps {
+  channelId: number | null;
+  messages: Array<{id: number; text: string; sender: string}>;
 }
 
-const MessageList: React.FC = () => {
-  const [messages, setMessages] = useState<Message[]>([]);
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      const messagesFromStorage: any[] = JSON.parse(
-        localStorage.getItem("message") || "[]"
-      );
-
-      const formattedMessages: Message[] = messagesFromStorage.map(
-        (message) => ({
-          id: message.id,
-          body: message.body,
-          created_at: message.created_at,
-          sender: message.sender.email,
-        })
-      );
-
-      setMessages(formattedMessages);
-    }, 1);
-
-    return () => clearInterval(intervalId);
-  }, []);
-
+const MessageList: React.FC<MessageListProps> = ({channelId, messages}) => {
   return (
-    <ul className="flex-grow overflow-auto border-t border-gray-200 mt-2 pt-2">
-      {messages.map((message) => (
-        <MessageItem key={message.id} message={message} />
-      ))}
+    <ul className="flex-grow overflow-auto">
+      {Array.isArray(messages) &&
+        messages.map((message) => (
+          <MessageItem key={message.id} message={message} />
+        ))}
     </ul>
   );
 };

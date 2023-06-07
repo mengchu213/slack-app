@@ -31,34 +31,10 @@ const Dashboard: React.FC<DashboardProps> = ({
   const [showNewChannel, setShowNewChannel] = useState(false);
   const [showNewDirectMessage, setShowNewDirectMessage] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
+
   const [messages, setMessages] = useState<
     Record<number, Array<{id: number; text: string; sender: string}>>
   >({});
-
-  const loadMessages = () => {
-    const currentUser = localStorage.getItem("currentUser");
-    if (currentUser) {
-      const storedMessages = JSON.parse(
-        localStorage.getItem(`${currentUser}.messages`) || "{}"
-      );
-      setMessages(storedMessages);
-    }
-  };
-
-  const saveMessages = (
-    newMessages: Record<
-      number,
-      Array<{id: number; text: string; sender: string}>
-    >
-  ) => {
-    const currentUser = localStorage.getItem("currentUser");
-    if (currentUser) {
-      localStorage.setItem(
-        `${currentUser}.messages`,
-        JSON.stringify(newMessages)
-      );
-    }
-  };
 
   const addMessage = (
     channelId: number,
@@ -66,12 +42,21 @@ const Dashboard: React.FC<DashboardProps> = ({
   ) => {
     setMessages((prevMessages) => {
       const channelMessages = prevMessages[channelId] || [];
-      const newMessages = {
+      const updatedMessages = {
         ...prevMessages,
         [channelId]: [...channelMessages, newMessage],
       };
-      saveMessages(newMessages);
-      return newMessages;
+
+      // store the updated messages in local storage
+      const currentUser = localStorage.getItem("currentUser");
+      if (currentUser) {
+        localStorage.setItem(
+          `${currentUser}.messages`,
+          JSON.stringify(updatedMessages)
+        );
+      }
+
+      return updatedMessages;
     });
   };
 
@@ -100,14 +85,11 @@ const Dashboard: React.FC<DashboardProps> = ({
   };
 
   const handleLogout = () => {
-    const currentUser = localStorage.getItem("currentUser");
     localStorage.removeItem("auth");
     localStorage.removeItem("currentUser");
-    if (currentUser) {
-      localStorage.removeItem(`${currentUser}.messages`);
-    }
+    localStorage.removeItem(`${localStorage.getItem("currentUser")}.messages`); // add this line
     setChannels([]);
-    setMessages({});
+    setMessages({}); // and reset the messages state
     navigate("/");
   };
 
@@ -118,14 +100,18 @@ const Dashboard: React.FC<DashboardProps> = ({
         localStorage.getItem(`${currentUser}.channelLists`) || "[]"
       );
       setChannels(storedChannels);
-      loadMessages();
+
+      const storedMessages = JSON.parse(
+        localStorage.getItem(`${currentUser}.messages`) || "{}"
+      );
+      setMessages(storedMessages);
     }
   }, []);
 
   return (
     <div className="flex flex-col h-screen">
       <button
-        className="absolute top-1 right-2   text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300  font-medium rounded-lg text-sm px-3 py-2 text-center mr-2 mb-2 "
+        className="absolute top-1.5 right-2  text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-2 mb-2"
         onClick={handleLogout}
       >
         Logout
@@ -143,7 +129,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         <Workspace
           selectedChannel={selectedChannel ? selectedChannel.id : null}
           selectedChannelName={selectedChannel ? selectedChannel.name : null}
-          messages={selectedChannel ? messages[selectedChannel.id] || [] : []}
+          messages={messages}
           addMessage={addMessage}
         />
 

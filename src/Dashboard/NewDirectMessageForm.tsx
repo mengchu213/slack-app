@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 
 const NewDirectMessageForm: React.FC = () => {
   const [username, setUsername] = useState("");
@@ -22,7 +22,8 @@ const NewDirectMessageForm: React.FC = () => {
         type="submit"
         className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 "
       >
-        Send Direct Message</button>
+        Send Direct Message
+      </button>
     </form>
   );
 };

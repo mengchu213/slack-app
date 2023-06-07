@@ -1,32 +1,29 @@
-import React, {useState, useEffect} from "react";
+import React from "react";
+
+interface Sender {
+  id: number;
+  provider: string;
+  uid: string;
+}
+
 interface Message {
   id: number;
   body: string;
   created_at: string;
-  sender: string;
+  receiver: {id: number; provider: string; uid: string};
+  sender: Sender;
 }
 
 interface MessageItemProps {
-  message: Message;
+  message: {id: number; text: string; sender: string};
 }
 
 const MessageItem: React.FC<MessageItemProps> = ({message}) => {
-  const [showTime, setShowTime] = useState(false);
-
   return (
-    <li
-      className="px-4 py-2 mb-1 hover:bg-gray-200 cursor-pointer"
-      onMouseEnter={() => setShowTime(true)}
-      onMouseLeave={() => setShowTime(false)}
-    >
+    <li className="px-4 py-2">
       <p className="text-sm text-gray-200">
-        <strong className="text-white">{message.sender}:</strong> {message.body}
+        <strong className="text-white">{message.sender}:</strong> {message.text}
       </p>
-      {showTime && (
-        <p className="text-xs text-gray-400">
-          {new Date(message.created_at).toLocaleString()}
-        </p>
-      )}
     </li>
   );
 };

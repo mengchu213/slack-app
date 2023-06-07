@@ -49,6 +49,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
         console.log("API errors:", response.data.errors);
       }
       console.log("API response:", response);
+      console.log("API response data:", response.data);
       const sender = localStorage.getItem("currentUserEmail");
 
       if (response.status === 200 && sender) {
