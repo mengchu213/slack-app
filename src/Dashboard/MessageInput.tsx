@@ -45,18 +45,11 @@ const MessageInput: React.FC<MessageInputProps> = ({
         newMessage,
         {headers}
       );
-
-      console.log("Response data:", response.data); // Check the structure of the response data
-
       if (response.data.errors) {
         console.log("API errors:", response.data.errors);
       }
-
       console.log("API response:", response);
-
       const sender = localStorage.getItem("currentUserEmail");
-
-      console.log("Sender:", sender); // Check if sender is what you expect
 
       if (response.status === 200 && sender) {
         const newMessage = {
@@ -64,7 +57,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
           text: response.data.data.body,
           sender: sender,
         };
-        console.log("New message:", newMessage); // Check the new message
         addMessage(selectedChannel, newMessage);
         setMessage("");
       }
@@ -83,11 +75,11 @@ const MessageInput: React.FC<MessageInputProps> = ({
         value={message}
         onChange={handleInputChange}
         placeholder="Type your message here"
-        className="flex-grow px-4 py-2 mr-2 bg-gray-300 rounded-l-full focus:outline-none"
+        className="flex-grow px-4 py-2 mr-2 bg-gray-300 rounded-lg focus:outline-none "
       />
       <button
         type="submit"
-        className="px-4 py-2 bg-gray-800 text-white rounded-r-full focus:outline-none"
+        className="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 mr-2 text-center"
       >
         Send
       </button>

@@ -73,14 +73,15 @@ const Workspace: React.FC<WorkspaceProps> = ({
   };
 
   return (
-    <div className="flex flex-col flex-grow bg-gray-700">
-      <div>
+    <div className="flex flex-col flex-grow bg-gray-700 ">
+      <div className="text-blue-500  px-5 py-5 text-2xl font-semibold">
         {selectedChannelName
           ? `Channel: ${selectedChannelName}`
           : "No Channel Selected"}
       </div>
 
       <MessageList messages={messages} />
+
       <MessageInput
         addMessage={handleAddMessage}
         selectedChannel={selectedChannel}

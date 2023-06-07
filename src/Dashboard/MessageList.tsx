@@ -1,17 +1,42 @@
+import React, {useState, useEffect} from "react";
 import MessageItem from "./MessageItem";
 
-interface MessageListProps {
-  messages: Array<{id: number; text: string; sender: string}>;
+interface Message {
+  id: number;
+  body: string;
+  created_at: string;
+  sender: string;
 }
 
-const MessageList: React.FC<MessageListProps> = ({messages}) => {
-  console.log("MessageList messages:", messages);
+const MessageList: React.FC = () => {
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const messagesFromStorage: any[] = JSON.parse(
+        localStorage.getItem("message") || "[]"
+      );
+
+      const formattedMessages: Message[] = messagesFromStorage.map(
+        (message) => ({
+          id: message.id,
+          body: message.body,
+          created_at: message.created_at,
+          sender: message.sender.email,
+        })
+      );
+
+      setMessages(formattedMessages);
+    }, 1);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
-    <ul className="flex-grow overflow-auto">
-      {Array.isArray(messages) &&
-        messages.map((message) => (
-          <MessageItem key={message.id} message={message} />
-        ))}
+    <ul className="flex-grow overflow-auto border-t border-gray-200 mt-2 pt-2">
+      {messages.map((message) => (
+        <MessageItem key={message.id} message={message} />
+      ))}
     </ul>
   );
 };

@@ -15,13 +15,13 @@ const Header: React.FC = () => {
   return (
     <header className="flex justify-between items-center bg-gray-800 px-4 py-2 border-b border-gray-200">
       <div className="header__left">
-        <Logo className="w-8 h-8" />
+        <Logo className="w-4 h-4" />
       </div>
       <div className="header__center">
         <SearchBar />
       </div>
       <div className="header__right">
-        <p className="text-white">{currentUserEmail || "Guest"}</p>
+        <p className="text-white mr-24">{currentUserEmail || "Guest"}</p>
       </div>
     </header>
   );

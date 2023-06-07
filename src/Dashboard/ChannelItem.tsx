@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useRef} from "react";
-
+import {FaCaretDown} from "react-icons/fa";
 interface ChannelItemProps {
   id: string;
   name: string;
@@ -43,27 +43,14 @@ const ChannelItem: React.FC<ChannelItemProps> = ({
         <div>
           <button
             type="button"
-            className="inline-flex justify-center w-8 h-8 items-center rounded-lg border text-sm font-medium text-gray-500  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="inline-flex justify-center w-8 h-8 items-center rounded-lg  text-sm font-medium text-gray-300  "
             id="options-menu"
             onClick={(e) => {
               e.stopPropagation();
               setIsOpen(!isOpen);
             }}
           >
-            <svg
-              className="h-5 w-5"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-              />
-            </svg>
+            <FaCaretDown />
           </button>
         </div>
         {isOpen && (
