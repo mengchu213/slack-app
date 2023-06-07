@@ -1,4 +1,4 @@
-import {useState, useEffect} from "react";
+import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import Sidebar from "./Sidebar";
 import Workspace from "./Workspace";
 import Header from "./Header";
@@ -9,19 +9,12 @@ import UserProfile from "./UserProfile";
 import {useNavigate} from "react-router-dom";
 
 interface DashboardProps {
-  channels: Array<{id: string; name: string}>;
-  setChannels: React.Dispatch<
-    React.SetStateAction<{id: string; name: string}[]>
-  >;
-  selectedChannel: {id: number; name: string} | null;
-  setSelectedChannel: React.Dispatch<
-    React.SetStateAction<{id: number; name: string} | null>
-  >;
-  messages: Record<number, Array<{id: number; text: string; sender: string}>>;
-  addMessage: (
-    channelId: number,
-    message: {id: number; text: string; sender: string}
-  ) => void;
+  channels: any[];
+  setChannels: Dispatch<SetStateAction<any[]>>;
+  selectedChannel: { id: number; name: string } | null;
+  setSelectedChannel: Dispatch<SetStateAction<{ id: number; name: string } | null>>;
+  messages: Record<number, Array<{ id: number; text: string; sender: string }>>;
+  addMessage: (channelId: number, message: { id: number; text: string; sender: string }) => void;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({
@@ -29,12 +22,24 @@ const Dashboard: React.FC<DashboardProps> = ({
   setChannels,
   selectedChannel,
   setSelectedChannel,
-  messages,
-  addMessage,
 }) => {
   const [showNewChannel, setShowNewChannel] = useState(false);
   const [showNewDirectMessage, setShowNewDirectMessage] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
+
+  const [messages, setMessages] = useState<
+    Record<number, Array<{id: number; text: string; sender: string}>>
+  >({});
+
+  const addMessage = (
+    channelId: number,
+    newMessage: {id: number; text: string; sender: string}
+  ) => {
+    setMessages((prevMessages) => {
+      const channelMessages = prevMessages[channelId] || [];
+      return {...prevMessages, [channelId]: [...channelMessages, newMessage]};
+    });
+  };
 
   const navigate = useNavigate();
 
@@ -99,14 +104,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           selectedChannel={selectedChannel ? selectedChannel.id : null}
           selectedChannelName={selectedChannel ? selectedChannel.name : null}
           messages={selectedChannel ? messages[selectedChannel.id] || [] : []}
-          addMessage={(
-            channelId: number,
-            message: {id: number; text: string; sender: string}
-          ) => {
-            if (selectedChannel) {
-              addMessage(channelId, message);
-            }
-          }}
+          addMessage={addMessage}
         />
 
         {showNewChannel && (

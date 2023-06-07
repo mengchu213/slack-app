@@ -38,7 +38,9 @@ export const LoginForm = () => {
       localStorage.setItem("currentUserEmail", formData.email);
 
       const email = formData.email;
-      const userListResponse = await getUsers(headers);
+      const userListResponse = await getUsers();
+
+
       const userList = userListResponse.data;
       const matchingUser = userList.find((user) => user.uid === email);
       let receiverId = null;

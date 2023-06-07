@@ -51,12 +51,9 @@ const Workspace: React.FC<WorkspaceProps> = ({
             }));
             console.log("fetchedMessages:", fetchedMessages);
 
-            // Removed duplicate forEach loop
-            if (selectedChannel) {
-              fetchedMessages.forEach((message) => {
-                addMessage(selectedChannel, message);
-              });
-            }
+            fetchedMessages.forEach((message) => {
+              addMessage(selectedChannel, message);
+            });
           } else {
             console.log("Unexpected data structure", response.data);
           }
@@ -68,6 +65,12 @@ const Workspace: React.FC<WorkspaceProps> = ({
 
     fetchMessages();
   }, [selectedChannel, addMessage]);
+  const handleAddMessage = (
+    channelId: number,
+    message: {id: number; text: string; sender: string}
+  ) => {
+    addMessage(channelId, message);
+  };
 
   return (
     <div className="flex flex-col flex-grow bg-gray-700">
@@ -78,7 +81,10 @@ const Workspace: React.FC<WorkspaceProps> = ({
       </div>
 
       <MessageList messages={messages} />
-      <MessageInput addMessage={addMessage} selectedChannel={selectedChannel} />
+      <MessageInput
+        addMessage={handleAddMessage}
+        selectedChannel={selectedChannel}
+      />
     </div>
   );
 };

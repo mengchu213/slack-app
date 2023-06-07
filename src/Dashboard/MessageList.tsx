@@ -5,6 +5,7 @@ interface MessageListProps {
 }
 
 const MessageList: React.FC<MessageListProps> = ({messages}) => {
+  console.log("MessageList messages:", messages);
   return (
     <ul className="flex-grow overflow-auto">
       {Array.isArray(messages) &&

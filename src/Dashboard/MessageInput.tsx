@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from "react";
+import React, {useState} from "react";
 import axios from "axios";
 
 interface MessageInputProps {
@@ -17,46 +17,6 @@ const MessageInput: React.FC<MessageInputProps> = ({
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(event.target.value);
-  };
-
-  const fetchMessages = async () => {
-    if (!selectedChannel) {
-      return;
-    }
-
-    const headers = {
-      "access-token": localStorage.getItem("access-token"),
-      client: localStorage.getItem("client"),
-      expiry: localStorage.getItem("expiry"),
-      uid: localStorage.getItem("uid"),
-    };
-
-    try {
-      const response = await axios.get(
-        `http://206.189.91.54/api/v1/messages?receiver_id=${selectedChannel}&receiver_class=Channel`,
-        {headers}
-      );
-
-      if (response.status === 200) {
-        if (Array.isArray(response.data)) {
-          const fetchedMessages = response.data.map((message: any) => ({
-            id: message.id,
-            text: message.body,
-            sender: message.sender,
-          }));
-
-          if (selectedChannel) {
-            fetchedMessages.forEach((message) => {
-              addMessage(selectedChannel, message);
-            });
-          }
-        } else {
-          console.log("Unexpected data structure", response.data);
-        }
-      }
-    } catch (err) {
-      console.error(err);
-    }
   };
 
   const handleFormSubmit = async (event: React.FormEvent) => {
@@ -85,20 +45,28 @@ const MessageInput: React.FC<MessageInputProps> = ({
         newMessage,
         {headers}
       );
+
+      console.log("Response data:", response.data); // Check the structure of the response data
+
       if (response.data.errors) {
         console.log("API errors:", response.data.errors);
       }
+
       console.log("API response:", response);
-      const sender = localStorage.getItem("email");
+
+      const sender = localStorage.getItem("currentUserEmail");
+
+      console.log("Sender:", sender); // Check if sender is what you expect
 
       if (response.status === 200 && sender) {
-        addMessage(selectedChannel, {
+        const newMessage = {
           id: response.data.data.id,
           text: response.data.data.body,
           sender: sender,
-        });
+        };
+        console.log("New message:", newMessage); // Check the new message
+        addMessage(selectedChannel, newMessage);
         setMessage("");
-        await fetchMessages();
       }
     } catch (error) {
       console.error("Failed to post message:", error);
