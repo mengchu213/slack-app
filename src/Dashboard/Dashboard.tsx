@@ -15,13 +15,10 @@ interface DashboardProps {
   setSelectedChannel: Dispatch<
     SetStateAction<{id: number; name: string} | null>
   >;
-  messages: Record<
-    number,
-    Array<{id: number; body: string; created_at: string; sender: string}>
-  >;
+  messages: Record<number, Array<{id: number; text: string; sender: string}>>;
   addMessage: (
     channelId: number,
-    message: {id: number; body: string; created_at: string; sender: string}
+    message: {id: number; text: string; sender: string}
   ) => void;
 }
 
@@ -30,8 +27,6 @@ const Dashboard: React.FC<DashboardProps> = ({
   setChannels,
   selectedChannel,
   setSelectedChannel,
-  messages, // Use the `messages` prop here
-  addMessage,
 }) => {
   const [showNewChannel, setShowNewChannel] = useState(false);
   const [showNewDirectMessage, setShowNewDirectMessage] = useState(false);
@@ -130,7 +125,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   return (
     <div className="flex flex-col h-screen">
       <button
-        className="absolute top-1.5 right-1 text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300  font-medium rounded-lg text-sm px-3.5 py-2 text-center mr-2 mb-2 "
+        className="absolute top-1 right-2   text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300  font-medium rounded-lg text-sm px-3 py-2 text-center mr-2 mb-2 "
         onClick={handleLogout}
       >
         Logout
