@@ -1,4 +1,4 @@
-import {useState, useEffect} from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Workspace from "./Workspace";
 import Header from "./Header";
@@ -6,17 +6,17 @@ import Modal from "../Auth/Modal";
 import NewChannelForm from "./NewChannelForm";
 import NewDirectMessageForm from "./NewDirectMessageForm";
 import UserProfile from "./UserProfile";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 
 interface DashboardProps {
-  channels: Array<{id: string; name: string}>;
+  channels: Array<{ id: string; name: string }>;
   setChannels: React.Dispatch<React.SetStateAction<any[]>>;
   setSelectedChannel: React.Dispatch<React.SetStateAction<string | null>>;
   selectedChannel: string | null;
 }
 const Dashboard: React.FC<DashboardProps> = () => {
-  const [channels, setChannels] = useState<Array<{id: string; name: string}>>(
+  const [channels, setChannels] = useState<Array<{ id: string; name: string }>>(
     []
   );
   const [showNewChannel, setShowNewChannel] = useState(false);
@@ -41,7 +41,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
         localStorage.getItem(`${currentUser}.channelLists`) || "[]"
       );
       storedChannels = storedChannels.filter(
-        (channel: {id: string}) => channel && channel.id !== id
+        (channel: { id: string }) => channel && channel.id !== id
       );
 
       localStorage.setItem(
@@ -57,9 +57,11 @@ const Dashboard: React.FC<DashboardProps> = () => {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem("auth");
-    localStorage.removeItem("currentUser");
-    localStorage.removeItem("message");
+    const keys = ["auth", "currentUser", "message", "uid", "expiry", "client", "access-token", "receiver"];
+
+    keys.forEach(key => {
+      localStorage.removeItem(key);
+    });
     setChannels([]);
     navigate("/");
   };
@@ -99,7 +101,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
           setChannels={setChannels}
           setSelectedChannel={setSelectedChannel}
           handleDeleteChannel={handleDeleteChannel}
-          onAddUser = {handleAddUser}
+          onAddUser={handleAddUser}
         />
 
         <Workspace selectedChannel={selectedChannel} />

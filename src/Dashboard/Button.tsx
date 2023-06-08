@@ -69,8 +69,7 @@ const Button: React.FC = () => {
           }, []);
       
           localStorage.setItem(currentUserId, JSON.stringify({ userLists: userListsArray }));
-      
-          console.log(userListsArray);
+          window.location.reload();
         } catch (error) {
           console.error(error);
         }

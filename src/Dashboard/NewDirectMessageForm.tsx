@@ -28,7 +28,6 @@ const NewDirectMessageForm: React.FC<NewDirectMessageFormProps> = ({ onHideModal
     const userListsObject = JSON.parse(localStorage.getItem(currentUserId) || '{}');
     const userLists = userListsObject.userLists || [];
     setUserLists(userLists);
-    console.log(userLists);
   }, []);
   
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {

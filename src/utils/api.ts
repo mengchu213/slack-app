@@ -51,6 +51,12 @@ interface UsersChannnel {
   data: any;
 }
 
+interface Messages {
+  receiver_id: number;
+  receiver_class: string;
+  body: string;
+}
+
 export const registerUser = async (registrationData: RegistrationData) => {
   try {
     const response = await axios.post(`${API_URL}/auth/`, registrationData);
@@ -154,6 +160,25 @@ export const sendMessage = async (messageData: Message) => {
   try {
     const response = await axios.post(`${API_URL}/messages`, messageData, {
       headers: getAuthHeaders(),
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const sendMessages = async (messageData: Messages, headers: any) => {
+  const { "access-token": accessToken, client, expiry, uid } = JSON.parse(localStorage.getItem("auth") || "{}") ?? {};
+  
+  try {
+    const response = await axios.post(`${API_URL}/messages`, messageData, {
+      headers: {
+        "access-token": accessToken,
+        client,
+        expiry,
+        uid
+      }
     });
     return response.data;
   } catch (error) {

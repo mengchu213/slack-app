@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { loginUser, getUserss, getMessages } from "../utils/api";
+import { loginUser, getUserss } from "../utils/api";
 import { useNavigate } from "react-router-dom";
 
 interface LoginFormData {
@@ -27,7 +27,6 @@ export const LoginForm = () => {
     setErrorMessage("");
     try {
       const headers = await loginUser(formData);
-      console.log(headers);
       setSuccessMessage("Login successful");
       localStorage.setItem("auth", JSON.stringify(headers));
       const email = formData.email;

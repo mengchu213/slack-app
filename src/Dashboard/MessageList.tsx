@@ -25,8 +25,8 @@ const MessageList = () => {
 
   return (
     <ul className="flex-grow overflow-auto border-t border-gray-200 mt-2 pt-2">
-      {messages.map((message) => (
-        <MessageItem key={message.id} message={message} />
+      {messages.map((message, index) => (
+        <MessageItem key={`${index}-${message.id}`} message={message} />
       ))}
     </ul>
   );

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getMessages } from "../utils/api";
 
 export const DirectMessageItems = () => {
@@ -7,18 +7,36 @@ export const DirectMessageItems = () => {
   const userLists = userListsObject.userLists || [];
 
   const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [messages, setMessages] = useState<any[]>([]);
 
   const handleButtonClick = async (id: number) => {
-    console.log(id);
     setSelectedId(id);
+    localStorage.setItem("receiver", JSON.stringify({receiverId: id, receiverClass: "User"}))
     try {
       const response = await getMessages(id, "User");
-      console.log(response);
+      setMessages(response.data);
       localStorage.setItem("message", JSON.stringify(response.data));
     } catch (error) {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    let interval: any;
+    if (selectedId !== null) {
+      interval = setInterval(async () => {
+        try {
+          const response = await getMessages(selectedId, "User");
+          setMessages(response.data);
+          localStorage.setItem("message", JSON.stringify(response.data));
+        } catch (error) {
+          console.error(error);
+        }
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [selectedId]);
 
   return (
     <div>
@@ -35,6 +53,11 @@ export const DirectMessageItems = () => {
               {user.uid}
             </button>
           ))}
+        </div>
+      ))}
+      {messages.map((message: any) => (
+        <div key={message.id}>
+          <p>{message.text}</p>
         </div>
       ))}
     </div>
