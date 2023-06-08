@@ -34,11 +34,11 @@ const MessageInput = ({ headers = {} }) => {
         value={body}
         onChange={handleInputChange}
         placeholder="Type your message here"
-        className="flex-grow px-4 py-2 mr-2 bg-gray-300 rounded-l-full focus:outline-none"
+        className="flex-grow px-4 py-2 mr-2 bg-gray-300 rounded-lg focus:outline-none "
       />
       <button
         type="submit"
-        className="px-4 py-2 bg-gray-800 text-white rounded-r-full focus:outline-none"
+        className="text-white bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 mr-2 text-center"
       >
         Send
       </button>

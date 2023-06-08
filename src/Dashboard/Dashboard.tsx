@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import Sidebar from "./Sidebar";
 import Workspace from "./Workspace";
 import Header from "./Header";
@@ -10,19 +10,61 @@ import { useNavigate } from "react-router-dom";
 
 
 interface DashboardProps {
-  channels: Array<{ id: string; name: string }>;
-  setChannels: React.Dispatch<React.SetStateAction<any[]>>;
-  setSelectedChannel: React.Dispatch<React.SetStateAction<string | null>>;
-  selectedChannel: string | null;
+  channels: any[];
+  setChannels: Dispatch<SetStateAction<any[]>>;
+  selectedChannel: { id: number; name: string } | null;
+  setSelectedChannel: Dispatch<
+    SetStateAction<{ id: number; name: string } | null>
+  >;
+  messages: Record<number, Array<Message>>;
+
+  addMessage: (channelId: number, message: Message) => void;
 }
-const Dashboard: React.FC<DashboardProps> = () => {
-  const [channels, setChannels] = useState<Array<{ id: string; name: string }>>(
-    []
-  );
+interface Sender {
+  id: number;
+  provider: string;
+  uid: string;
+}
+
+interface Message {
+  id?: number;
+  body: string;
+  sender_id: number;
+  receiver_id: number;
+  created_at?: string;
+  updated_at?: string;
+  senderEmail?: string;
+}
+const Dashboard: React.FC<DashboardProps> = ({
+  channels,
+  setChannels,
+  selectedChannel,
+  setSelectedChannel,
+}) => {
   const [showNewChannel, setShowNewChannel] = useState(false);
   const [showNewDirectMessage, setShowNewDirectMessage] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
-  const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Record<number, Message[]>>({});
+
+  const addMessage = (channelId: number, newMessage: Message) => {
+    setMessages((prevMessages) => {
+      const channelMessages = prevMessages[channelId] || [];
+      const updatedMessages = {
+        ...prevMessages,
+        [channelId]: [...channelMessages, newMessage],
+      };
+
+      const currentUser = localStorage.getItem("currentUser");
+      if (currentUser) {
+        localStorage.setItem(
+          `${currentUser}.messages`,
+          JSON.stringify(updatedMessages)
+        );
+      }
+
+      return updatedMessages;
+    });
+  };
 
   const navigate = useNavigate();
 
@@ -34,14 +76,14 @@ const Dashboard: React.FC<DashboardProps> = () => {
     setShowNewDirectMessage(true);
   };
 
-  const handleDeleteChannel = (id: string) => {
+  const handleDeleteChannel = (id: number) => {
     const currentUser = localStorage.getItem("currentUser");
     if (currentUser) {
       let storedChannels = JSON.parse(
         localStorage.getItem(`${currentUser}.channelLists`) || "[]"
       );
       storedChannels = storedChannels.filter(
-        (channel: { id: string }) => channel && channel.id !== id
+        (channel: { id: number }) => channel && channel.id !== id
       );
 
       localStorage.setItem(
@@ -73,6 +115,11 @@ const Dashboard: React.FC<DashboardProps> = () => {
         localStorage.getItem(`${currentUser}.channelLists`) || "[]"
       );
       setChannels(storedChannels);
+
+      const storedMessages = JSON.parse(
+        localStorage.getItem(`${currentUser}.messages`) || "{}"
+      );
+      setMessages(storedMessages);
     }
   }, []);
 
@@ -88,7 +135,7 @@ const Dashboard: React.FC<DashboardProps> = () => {
   return (
     <div className="flex flex-col h-screen">
       <button
-        className="absolute top-10 right-0 m-4 p-2 bg-gray-300 rounded-md"
+        className="absolute top-1.5 right-2  text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 text-center mr-2 mb-2"
         onClick={handleLogout}
       >
         Logout
@@ -96,15 +143,20 @@ const Dashboard: React.FC<DashboardProps> = () => {
       <Header />
       <div className="flex flex-grow">
         <Sidebar
-          onAddChannel={handleAddChannel}
           channels={channels}
-          setChannels={setChannels}
-          setSelectedChannel={setSelectedChannel}
+          onAddChannel={handleAddChannel}
           handleDeleteChannel={handleDeleteChannel}
+          setSelectedChannel={setSelectedChannel}
+          setChannels={setChannels}
           onAddUser={handleAddUser}
         />
 
-        <Workspace selectedChannel={selectedChannel} />
+        <Workspace
+          selectedChannel={selectedChannel ? selectedChannel.id : null}
+          selectedChannelName={selectedChannel ? selectedChannel.name : null}
+          messages={messages}
+          addMessage={addMessage}
+        />
       </div>
 
       {showNewChannel && (

@@ -156,14 +156,14 @@ export const getMessages = async (
   }
 };
 
-export const sendMessage = async (messageData: Message) => {
+export const sendMessage = async (messageData: Message, headers: any) => {
   try {
     const response = await axios.post(`${API_URL}/messages`, messageData, {
-      headers: getAuthHeaders(),
+      headers,
     });
     return response.data;
   } catch (error) {
-    console.error(error);
+    console.error("Error in sendMessage:", error);
     throw error;
   }
 };

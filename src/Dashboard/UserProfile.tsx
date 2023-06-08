@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from "react";
 import axios from "axios";
-import key from "../utils/keys";
 
 interface UserProfileProps {
   userId: number;
@@ -20,7 +19,7 @@ const UserProfile: React.FC<UserProfileProps> = ({userId}) => {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get(`${key.API_URL}/users`);
+        const response = await axios.get("http://206.189.91.54/api/v1/users");
         const userData = response.data.find((user: User) => user.id === userId);
         setUser(userData);
       } catch (error) {

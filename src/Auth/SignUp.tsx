@@ -27,12 +27,16 @@ export const SignUp = () => {
 
   return (
     <>
-      <button
-        onClick={handleOpenModal}
-        className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800"
-      >
-        Sign Up
-      </button>
+      <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+        Don’t have an account yet?{" "}
+        <button
+          onClick={handleOpenModal}
+          className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+        >
+          Sign Up
+        </button>
+      </p>
+
       {isModalOpen && (
         <Modal onClose={handleCloseModal}>
           <div
@@ -48,20 +52,27 @@ export const SignUp = () => {
               >
                 &#8203;
               </span>
-              <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div className="bg-white p-4 rounded-lg shadow">
+              <div className="inline-block align-bottom dark:bg-gray-800 dark:border-gray-700 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+                  <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+                    Create an account
+                  </h1>
                   <RegistrationFormFields
                     setModalOpen={setModalOpen}
                     setErrorMessage={setErrorMessage}
                     setSuccessMessage={setSuccessMessage}
                   />
-                  <button
-                    type="button"
-                    onClick={handleCloseModal}
-                    className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-gradient-to-r from-cyan-400 via-cyan-500 to-cyan-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 mt-6"
-                  >
-                    Back
-                  </button>
+                  <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+                    Already have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={handleCloseModal}
+                      className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+                    >
+                      Login here
+                    </button>
+                  </p>
+
                   {errorMessage && (
                     <p className="text-red-500">{errorMessage}</p>
                   )}
