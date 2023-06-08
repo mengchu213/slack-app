@@ -1,61 +1,26 @@
-import React, {useState} from "react";
-import axios from "axios";
-import {sendMessage, getAuthHeaders} from "../utils/api"; // Import from your API file
+import React, { useState } from "react";
+import { sendMessages } from "../utils/api";
 
-interface MessageInputProps {
-  addMessage: (channelId: number, message: Message) => void;
-  selectedChannel: number | null;
-}
-
-interface Message {
-  id?: number;
-  body: string;
-  sender_id: number;
-  receiver_id: number;
-  created_at?: string;
-  updated_at?: string;
-  senderEmail?: string;
-}
-
-const MessageInput: React.FC<MessageInputProps> = ({
-  addMessage,
-  selectedChannel,
-}) => {
-  const [message, setMessage] = useState("");
+const MessageInput = ({ headers = {} }) => {
+  const [body, setBody] = useState("");
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage(event.target.value);
+    setBody(event.target.value);
   };
+
+  const receiver = JSON.parse(localStorage.getItem("receiver") || "{}");
 
   const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
-    if (!selectedChannel) {
-      return;
-    }
-
-    const sender_id = Number(localStorage.getItem("uid"));
-    const currentUserEmail = localStorage.getItem("email");
-    const newMessage = {
-      body: message,
-      sender_id,
-      receiver_id: selectedChannel,
-      receiver_class: "Channel",
-      senderEmail: currentUserEmail,
-    };
-
     try {
-      const response = await sendMessage(newMessage, getAuthHeaders());
-
-      if (response.errors) {
-        console.log("API errors:", response.errors);
-      } else {
-        const returnedMessage = response;
-        addMessage(selectedChannel, returnedMessage);
-        setMessage("");
-      }
+      await sendMessages({
+        receiver_id: receiver.receiverId,
+        receiver_class: receiver.receiverClass,
+        body: body
+      }, headers);
+      setBody("");
     } catch (error) {
-      console.error("Error in handleFormSubmit:", error);
+      console.error(error);
     }
   };
 
@@ -66,7 +31,7 @@ const MessageInput: React.FC<MessageInputProps> = ({
     >
       <input
         type="text"
-        value={message}
+        value={body}
         onChange={handleInputChange}
         placeholder="Type your message here"
         className="flex-grow px-4 py-2 mr-2 bg-gray-300 rounded-lg focus:outline-none "

@@ -1,17 +1,10 @@
-import {useEffect, useState} from "react";
-import {loginUser, getUsers, getMessages} from "../utils/api";
-import {useNavigate} from "react-router-dom";
+import { useEffect, useState } from "react";
+import { loginUser, getUserss } from "../utils/api";
+import { useNavigate } from "react-router-dom";
 
 interface LoginFormData {
   email: string;
   password: string;
-}
-
-interface AuthData {
-  "access-token"?: string;
-  client?: string;
-  expiry?: string;
-  uid?: string;
 }
 
 export const LoginForm = () => {
@@ -24,8 +17,8 @@ export const LoginForm = () => {
   const [successMessage, setSuccessMessage] = useState("");
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = event.target;
-    setFormData((prevFormData) => ({...prevFormData, [name]: value}));
+    const { name, value } = event.target;
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -33,56 +26,28 @@ export const LoginForm = () => {
     setSuccessMessage("");
     setErrorMessage("");
     try {
-      const {headers} = await loginUser(formData);
-      localStorage.setItem("auth", JSON.stringify(headers));
-      localStorage.setItem("currentUserEmail", formData.email);
-
-      const email = formData.email;
-      const userListResponse = await getUsers();
-
-      const userList = userListResponse.data;
-      const matchingUser = userList.find((user) => user.uid === email);
-      let receiverId = null;
-      if (matchingUser) {
-        receiverId = matchingUser.id;
-        localStorage.setItem("currentUser", JSON.stringify(receiverId));
-      }
-
-      if (receiverId !== null) {
-        const messages = await getMessages(receiverId, "User");
-        localStorage.setItem("currentUserMessages", JSON.stringify(messages));
-      } else {
-        throw new Error("User ID not found");
-      }
-
+      const headers = await loginUser(formData);
       setSuccessMessage("Login successful");
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 2000);
+      localStorage.setItem("auth", JSON.stringify(headers));
+      const email = formData.email;
+      const userListResponse = await getUserss({});
+      const userList = userListResponse.data;
+      const matchingUser = userList.find(user => user.uid === email);
+      if (matchingUser) {
+        const receiverId = matchingUser.id;
+        localStorage.setItem('currentUser', JSON.stringify(receiverId))
+      }
+      navigate("/dashboard");
     } catch (error) {
       console.error(error);
       setErrorMessage("Invalid email or password");
+      return;
     }
   };
 
+
   useEffect(() => {
-    console.log("Checking localStorage:", localStorage.getItem("auth"));
-    const authData = localStorage.getItem("auth");
-    let auth: AuthData = {};
-
-    if (authData) {
-      try {
-        auth = JSON.parse(authData);
-      } catch (e) {
-        console.error("Error parsing auth data from localStorage:", e);
-        auth = {};
-      }
-    } else {
-      console.warn("No auth data in localStorage");
-      return;
-    }
-
-    const {"access-token": accessToken, client, expiry, uid} = auth;
+    const { "access-token": accessToken, client, expiry, uid } = JSON.parse(localStorage.getItem("auth") || "{}");
     if (accessToken && client && expiry && uid) {
       setTimeout(() => {
         navigate("/dashboard");
@@ -126,7 +91,6 @@ export const LoginForm = () => {
               aria-describedby="remember"
               type="checkbox"
               className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"
-              required
             ></input>
           </div>
           <div className="ml-3 text-sm">

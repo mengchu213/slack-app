@@ -1,4 +1,4 @@
-import {useState, useEffect, Dispatch, SetStateAction} from "react";
+import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import Sidebar from "./Sidebar";
 import Workspace from "./Workspace";
 import Header from "./Header";
@@ -6,14 +6,15 @@ import Modal from "../Auth/Modal";
 import NewChannelForm from "./NewChannelForm";
 import NewDirectMessageForm from "./NewDirectMessageForm";
 import UserProfile from "./UserProfile";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 
 interface DashboardProps {
   channels: any[];
   setChannels: Dispatch<SetStateAction<any[]>>;
-  selectedChannel: {id: number; name: string} | null;
+  selectedChannel: { id: number; name: string } | null;
   setSelectedChannel: Dispatch<
-    SetStateAction<{id: number; name: string} | null>
+    SetStateAction<{ id: number; name: string } | null>
   >;
   messages: Record<number, Array<Message>>;
 
@@ -71,6 +72,10 @@ const Dashboard: React.FC<DashboardProps> = ({
     setShowNewChannel(true);
   };
 
+  const handleAddUser = () => {
+    setShowNewDirectMessage(true);
+  };
+
   const handleDeleteChannel = (id: number) => {
     const currentUser = localStorage.getItem("currentUser");
     if (currentUser) {
@@ -78,7 +83,7 @@ const Dashboard: React.FC<DashboardProps> = ({
         localStorage.getItem(`${currentUser}.channelLists`) || "[]"
       );
       storedChannels = storedChannels.filter(
-        (channel: {id: number}) => channel && channel.id !== id
+        (channel: { id: number }) => channel && channel.id !== id
       );
 
       localStorage.setItem(
@@ -89,12 +94,17 @@ const Dashboard: React.FC<DashboardProps> = ({
     }
   };
 
+  const handleHideDirectMessageModal = () => {
+    setShowNewDirectMessage(false);
+  }
+
   const handleLogout = () => {
-    localStorage.removeItem("auth");
-    localStorage.removeItem("currentUser");
-    localStorage.removeItem(`${localStorage.getItem("currentUser")}.messages`);
+    const keys = ["auth", "currentUser", "message", "uid", "expiry", "client", "access-token", "receiver"];
+
+    keys.forEach(key => {
+      localStorage.removeItem(key);
+    });
     setChannels([]);
-    setMessages({});
     navigate("/");
   };
 
@@ -110,6 +120,15 @@ const Dashboard: React.FC<DashboardProps> = ({
         localStorage.getItem(`${currentUser}.messages`) || "{}"
       );
       setMessages(storedMessages);
+    }
+  }, []);
+
+  useEffect(() => {
+    const { "access-token": accessToken, client, expiry, uid } = JSON.parse(localStorage.getItem("auth") || "{}");
+    if (!accessToken && !client && !expiry && !uid) {
+      setTimeout(() => {
+        navigate("/");
+      }, 10);
     }
   }, []);
 
@@ -129,6 +148,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           handleDeleteChannel={handleDeleteChannel}
           setSelectedChannel={setSelectedChannel}
           setChannels={setChannels}
+          onAddUser={handleAddUser}
         />
 
         <Workspace
@@ -137,23 +157,23 @@ const Dashboard: React.FC<DashboardProps> = ({
           messages={messages}
           addMessage={addMessage}
         />
-
-        {showNewChannel && (
-          <Modal onClose={() => setShowNewChannel(false)}>
-            <NewChannelForm setChannels={setChannels} />
-          </Modal>
-        )}
-        {showNewDirectMessage && (
-          <Modal onClose={() => setShowNewDirectMessage(false)}>
-            <NewDirectMessageForm />
-          </Modal>
-        )}
-        {showUserProfile && (
-          <Modal onClose={() => setShowUserProfile(false)}>
-            <UserProfile name="User Name" email="user@example.com" userId={0} />
-          </Modal>
-        )}
       </div>
+
+      {showNewChannel && (
+        <Modal onClose={() => setShowNewChannel(false)}>
+          <NewChannelForm setChannels={setChannels} />
+        </Modal>
+      )}
+      {showNewDirectMessage && (
+        <Modal onClose={handleHideDirectMessageModal}>
+          <NewDirectMessageForm onHideModal={handleHideDirectMessageModal} />
+        </Modal>
+      )}
+      {showUserProfile && (
+        <Modal onClose={() => setShowUserProfile(false)}>
+          <UserProfile name="User Name" email="user@example.com" userId={0} />
+        </Modal>
+      )}
     </div>
   );
 };

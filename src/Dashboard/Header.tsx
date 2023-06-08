@@ -3,14 +3,7 @@ import SearchBar from "./SearchBar";
 import {ReactComponent as Logo} from "../assets/logo.svg";
 
 const Header: React.FC = () => {
-  const [currentUserEmail, setCurrentUserEmail] = useState("");
-
-  useEffect(() => {
-    const email = localStorage.getItem("currentUserEmail");
-    if (email) {
-      setCurrentUserEmail(email);
-    }
-  }, []);
+  const currentUser: string | null = localStorage.getItem("uid");
 
   return (
     <header className="flex justify-between items-center bg-gray-800 px-4 py-2 border-b border-gray-200">
@@ -21,7 +14,7 @@ const Header: React.FC = () => {
         <SearchBar />
       </div>
       <div className="header__right">
-        <p className="text-white mr-24">{currentUserEmail || "Guest"}</p>
+        <p className="text-white mr-24">{currentUser}</p>
       </div>
     </header>
   );

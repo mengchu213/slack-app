@@ -37,18 +37,24 @@ interface ChannelData {
 }
 
 interface Message {
-  id?: number;
-  body: string;
+  id: number;
   sender_id: number;
   receiver_id: number;
-  created_at?: string;
-  updated_at?: string;
+  body: string;
+  created_at: string;
+  updated_at: string;
 }
 
 interface UsersChannnel {
   id: number;
   name: string;
   data: any;
+}
+
+interface Messages {
+  receiver_id: number;
+  receiver_class: string;
+  body: string;
 }
 
 export const registerUser = async (registrationData: RegistrationData) => {
@@ -98,11 +104,9 @@ export const getUsers = async (): Promise<{uid: string; data: User[]}> => {
   }
 };
 
-export const getUserss = async (
-  headers: any
-): Promise<{uid: string; data: UserLists[]}> => {
+export const getUserss = async (headers: any): Promise<{ uid: string, data: UserLists[] }> => {
   const authData = JSON.parse(localStorage.getItem("auth") || "{}");
-  const {"access-token": accessToken, client, expiry, uid} = authData;
+  const { "access-token": accessToken, client, expiry, uid } = authData;
 
   try {
     const response = await axios.get(`${API_URL}/users`, {
@@ -110,8 +114,8 @@ export const getUserss = async (
         "access-token": accessToken,
         client: client,
         expiry: expiry,
-        uid: uid,
-      },
+        uid: uid
+      }
     });
     return response.data;
   } catch (error) {
@@ -160,6 +164,25 @@ export const sendMessage = async (messageData: Message, headers: any) => {
     return response.data;
   } catch (error) {
     console.error("Error in sendMessage:", error);
+    throw error;
+  }
+};
+
+export const sendMessages = async (messageData: Messages, headers: any) => {
+  const { "access-token": accessToken, client, expiry, uid } = JSON.parse(localStorage.getItem("auth") || "{}") ?? {};
+  
+  try {
+    const response = await axios.post(`${API_URL}/messages`, messageData, {
+      headers: {
+        "access-token": accessToken,
+        client,
+        expiry,
+        uid
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
     throw error;
   }
 };

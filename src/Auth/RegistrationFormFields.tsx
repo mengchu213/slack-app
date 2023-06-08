@@ -1,5 +1,5 @@
-import React, {useState} from "react";
-import {registerUser} from "../utils/api";
+import React, { useState } from "react";
+import { registerUser } from "../utils/api";
 
 export interface RegistrationFormFields {
   email: string;
@@ -25,8 +25,8 @@ export const RegistrationFormFields = ({
   });
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = event.target;
-    setFormData((prevFormData) => ({...prevFormData, [name]: value}));
+    const { name, value } = event.target;
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {

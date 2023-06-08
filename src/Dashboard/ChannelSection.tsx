@@ -1,6 +1,6 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import ChannelItem from "./ChannelItem";
-import {FaPlus} from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 interface ChannelSectionProps {
   onAddChannel: () => void;
   channels: Array<{id: number; name: string}>;

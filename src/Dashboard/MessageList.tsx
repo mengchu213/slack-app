@@ -1,32 +1,33 @@
-import {useState, useEffect} from "react";
+import { useEffect, useState } from "react";
 import MessageItem from "./MessageItem";
 
 interface Message {
-  id?: number;
+  id: number;
   body: string;
-  sender_id: number;
-  receiver_id: number;
-  created_at?: string;
-  updated_at?: string;
-  senderEmail?: string;
+  created_at: string;
+  receiver: { id: number; provider: string; uid: string };
+  sender: { id: number; provider: string; uid: string };
 }
 
-interface MessageListProps {
-  channelId: number | null;
-  messages: Message[];
-}
+const MessageList = () => {
+  const [messages, setMessages] = useState<Message[]>([]);
 
-const MessageList: React.FC<MessageListProps> = ({
-  channelId,
-  messages = [],
-}) => {
-  console.log("Received these messages:", messages);
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const messagesFromStorage: Message[] = JSON.parse(
+        localStorage.getItem("message") || "[]"
+      );
+      setMessages(messagesFromStorage);
+    }, 1);
+
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
-    <ul className="flex-grow overflow-auto">
-      {Array.isArray(messages) &&
-        messages.map((message) => (
-          <MessageItem key={message.id} message={message} />
-        ))}
+    <ul className="flex-grow overflow-auto border-t border-gray-200 mt-2 pt-2">
+      {messages.map((message, index) => (
+        <MessageItem key={`${index}-${message.id}`} message={message} />
+      ))}
     </ul>
   );
 };
