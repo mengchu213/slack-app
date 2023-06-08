@@ -1,36 +1,52 @@
 import React, {useState} from "react";
-import {sendMessages, getAuthHeaders} from "../utils/api";
+import {sendMessages} from "../utils/api";
 
 interface MessageInputProps {
-  selectedChannel?: number | null;
+  selectedChannel: number | null;
+  headers?: {};
 }
 
-const MessageInput: React.FC<MessageInputProps> = ({selectedChannel}) => {
-  const [body, setBody] = useState<string>("");
+const MessageInput: React.FC<MessageInputProps> = ({
+  selectedChannel,
+  headers = {},
+}) => {
+  const [body, setBody] = useState("");
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setBody(event.target.value);
   };
 
+  const selectReceiver = (receiverId: number, receiverClass: string) => {
+    localStorage.setItem(
+      "receiver",
+      JSON.stringify({receiverId, receiverClass})
+    );
+  };
+
   const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (selectedChannel != null) {
+
+    const receiver = JSON.parse(localStorage.getItem("receiver") || "{}");
+    const receiverId = receiver.receiverId;
+    const receiverClass = receiver.receiverClass;
+
+    if (receiverId && receiverClass) {
       try {
-        const headers = getAuthHeaders();
         await sendMessages(
           {
-            receiver_id: selectedChannel,
-            receiver_class: "Channel",
+            receiver_id: receiverId,
+            receiver_class: receiverClass,
             body: body,
           },
           headers
         );
+
         setBody("");
       } catch (error) {
         console.error(error);
       }
     } else {
-      console.error("No channel selected");
+      console.log("Receiver data is missing or invalid.");
     }
   };
 
@@ -44,7 +60,7 @@ const MessageInput: React.FC<MessageInputProps> = ({selectedChannel}) => {
         value={body}
         onChange={handleInputChange}
         placeholder="Type your message here"
-        className="flex-grow px-4 py-2 mr-2 bg-gray-300 rounded-lg focus:outline-none"
+        className="flex-grow px-4 py-2 mr-2 bg-gray-300 rounded-lg focus:outline-none "
       />
       <button
         type="submit"

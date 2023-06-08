@@ -11,6 +11,7 @@ interface SidebarProps {
     React.SetStateAction<{id: number; name: string} | null>
   >;
   handleDeleteChannel: (id: number) => void;
+  onAddUser: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -19,6 +20,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   setChannels,
   setSelectedChannel,
   handleDeleteChannel,
+  onAddUser,
 }) => {
   return (
     <div className="h-screen w-64 bg-gray-800 text-white overflow-auto">
@@ -34,7 +36,7 @@ const Sidebar: React.FC<SidebarProps> = ({
         handleDeleteChannel={handleDeleteChannel}
       />
 
-      <DirectMessageSection />
+      <DirectMessageSection onAddUser={onAddUser} />
     </div>
   );
 };
