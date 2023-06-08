@@ -43,6 +43,7 @@ interface Message {
   receiver_id: number;
   created_at?: string;
   updated_at?: string;
+  senderEmail?: string;
 }
 interface Messages {
   receiver_id: number;
@@ -150,6 +151,14 @@ export const getMessages = async (
       },
       headers: headers || getAuthHeaders(),
     });
+
+    if (response.data && Array.isArray(response.data)) {
+      localStorage.setItem(
+        receiverId.toString(),
+        JSON.stringify(response.data)
+      );
+    }
+
     return response.data;
   } catch (error) {
     console.error(error);
@@ -162,19 +171,45 @@ export const sendMessage = async (messageData: Message, headers: any) => {
     const response = await axios.post(`${API_URL}/messages`, messageData, {
       headers,
     });
+
+    let updatedMessages = localStorage.getItem(
+      messageData.receiver_id.toString()
+    );
+
+    if (updatedMessages === null || updatedMessages === undefined) {
+      updatedMessages = "[]";
+    }
+
+    const messages = JSON.parse(updatedMessages);
+    messages.push(response.data);
+    localStorage.setItem(
+      messageData.receiver_id.toString(),
+      JSON.stringify(messages)
+    );
+
     return response.data;
   } catch (error) {
     console.error("Error in sendMessage:", error);
     throw error;
   }
 };
+
 export const sendMessages = async (messageData: Messages, headers: any) => {
-  const {
-    "access-token": accessToken,
-    client,
-    expiry,
-    uid,
-  } = JSON.parse(localStorage.getItem("auth") || "{}") ?? {};
+  let auth = localStorage.getItem("auth");
+  let accessToken, client, expiry, uid;
+
+  if (auth) {
+    const authData = JSON.parse(auth);
+    accessToken = authData["access-token"];
+    client = authData.client;
+    expiry = authData.expiry;
+    uid = authData.uid;
+  } else {
+    accessToken = "";
+    client = "";
+    expiry = "";
+    uid = "";
+  }
 
   try {
     const response = await axios.post(`${API_URL}/messages`, messageData, {
@@ -185,6 +220,26 @@ export const sendMessages = async (messageData: Messages, headers: any) => {
         uid,
       },
     });
+
+    let updatedMessages = localStorage.getItem(
+      messageData.receiver_id.toString()
+    );
+
+    if (
+      updatedMessages === null ||
+      updatedMessages === undefined ||
+      updatedMessages === "undefined"
+    ) {
+      updatedMessages = "[]";
+    }
+
+    const messages = JSON.parse(updatedMessages);
+    messages.push(response.data);
+    localStorage.setItem(
+      messageData.receiver_id.toString(),
+      JSON.stringify(messages)
+    );
+
     return response.data;
   } catch (error) {
     console.error(error);
@@ -203,6 +258,7 @@ export const createChannel = async (channelData: ChannelData) => {
     throw error;
   }
 };
+
 export const getAndStoreChannels = async () => {
   try {
     const channels = await getUsersChannel();

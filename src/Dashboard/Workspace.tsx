@@ -2,6 +2,7 @@ import React, {useState, useEffect} from "react";
 import MessageList from "./MessageList";
 import MessageInput from "./MessageInput";
 import {getMessages, getAuthHeaders} from "../utils/api";
+
 interface Sender {
   id: number;
   provider: string;
@@ -15,26 +16,20 @@ interface Message {
   receiver_id: number;
   created_at?: string;
   updated_at?: string;
+  senderEmail?: string;
 }
 
 interface WorkspaceProps {
-  selectedChannel: number | null;
+  selectedChannel?: number | null;
   selectedChannelName: string | null;
   messages: Record<number, Message[]>;
-  addMessage: (channelId: number, message: Message) => void;
+  addMessage: (channelId: number, newMessage: Message) => void;
 }
 
 const Workspace: React.FC<WorkspaceProps> = ({
   selectedChannel,
   selectedChannelName,
-  addMessage,
 }) => {
-  const [messages, setMessages] = useState<Record<number, Message[]>>({});
-
-  useEffect(() => {
-    console.log("messages state changed:", messages);
-  }, [messages]);
-
   useEffect(() => {
     const fetchMessages = async () => {
       if (!selectedChannel) {
@@ -48,12 +43,10 @@ const Workspace: React.FC<WorkspaceProps> = ({
           getAuthHeaders()
         );
         if (response.data && Array.isArray(response.data)) {
-          const fetchedMessages = response.data;
-          setMessages((prevMessages) => ({
-            ...prevMessages,
-            [selectedChannel]: fetchedMessages,
-          }));
-          console.log("Current state of messages:", messages);
+          localStorage.setItem(
+            selectedChannel.toString(),
+            JSON.stringify(response.data)
+          );
         } else {
           console.log("Unexpected data structure", response.data);
         }
@@ -62,14 +55,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
       }
     };
     fetchMessages();
-  }, [selectedChannel, addMessage]);
-
-  console.log(
-    "Passing these messages to MessageList:",
-    selectedChannel !== null && messages.hasOwnProperty(selectedChannel)
-      ? messages[selectedChannel]
-      : []
-  );
+  }, [selectedChannel]);
 
   return (
     <div className="flex flex-col flex-grow bg-gray-700 ">
@@ -79,16 +65,8 @@ const Workspace: React.FC<WorkspaceProps> = ({
           : "No Channel Selected"}
       </div>
 
-      <MessageList
-        channelId={selectedChannel}
-        messages={
-          selectedChannel !== null && messages.hasOwnProperty(selectedChannel)
-            ? messages[selectedChannel]
-            : []
-        }
-      />
-
-      <MessageInput addMessage={addMessage} selectedChannel={selectedChannel} />
+      <MessageList channelId={selectedChannel ?? null} />
+      <MessageInput selectedChannel={selectedChannel ?? null} />
     </div>
   );
 };

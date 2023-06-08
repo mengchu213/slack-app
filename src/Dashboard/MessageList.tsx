@@ -13,13 +13,20 @@ interface Message {
 
 interface MessageListProps {
   channelId: number | null;
-  messages: Message[];
 }
 
-const MessageList: React.FC<MessageListProps> = ({
-  channelId,
-  messages = [],
-}) => {
+const MessageList: React.FC<MessageListProps> = ({channelId}) => {
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
+    if (channelId !== null) {
+      const storedMessages = localStorage.getItem(channelId.toString());
+      if (storedMessages !== null) {
+        setMessages(JSON.parse(storedMessages));
+      }
+    }
+  }, [channelId]);
+
   console.log("Received these messages:", messages);
   return (
     <ul className="flex-grow overflow-auto">

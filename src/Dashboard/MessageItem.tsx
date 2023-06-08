@@ -19,7 +19,7 @@ const MessageItem: React.FC<MessageItemProps> = ({message}) => {
     <li className="px-4 py-2">
       <p className="text-sm text-gray-200">
         <strong className="text-white">{message.sender_id}:</strong>{" "}
-        <h4>{message.senderEmail}</h4>
+        <p>{message.senderEmail}</p>
         {message.body}
       </p>
     </li>
