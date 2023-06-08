@@ -1,17 +1,27 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
+import { sendMessages } from "../utils/api";
 
-const MessageInput = () => {
-  const [message, setMessage] = useState("");
+const MessageInput = ({ headers = {} }) => {
+  const [body, setBody] = useState("");
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setMessage(event.target.value);
+    setBody(event.target.value);
   };
 
-  const handleFormSubmit = (event: React.FormEvent) => {
+  const receiver = JSON.parse(localStorage.getItem("receiver") || "{}");
+
+  const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    console.log("Send message:", message);
-    setMessage("");
-    //send the message to your backend.
+    try {
+      await sendMessages({
+        receiver_id: receiver.receiverId,
+        receiver_class: receiver.receiverClass,
+        body: body
+      }, headers);
+      setBody("");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -21,7 +31,7 @@ const MessageInput = () => {
     >
       <input
         type="text"
-        value={message}
+        value={body}
         onChange={handleInputChange}
         placeholder="Type your message here"
         className="flex-grow px-4 py-2 mr-2 bg-gray-300 rounded-l-full focus:outline-none"

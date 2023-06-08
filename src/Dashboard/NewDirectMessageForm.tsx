@@ -25,23 +25,25 @@ const NewDirectMessageForm: React.FC<NewDirectMessageFormProps> = ({ onHideModal
 
   useEffect(() => {
     const currentUserId: string = localStorage.currentUser || "";
-    const userListsString = localStorage.getItem(`${currentUserId}`) ?? "[]";
-    setUserLists(JSON.parse(userListsString));
-    console.log(userListsString);
+    const userListsObject = JSON.parse(localStorage.getItem(currentUserId) || '{}');
+    const userLists = userListsObject.userLists || [];
+    setUserLists(userLists);
   }, []);
-
+  
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
+  
     try {
       const selectedUser = { id: selectedUsers.value, uid: selectedUsers.email };
-
+  
       const currentUserId: string = localStorage.currentUser || "";
-
-
+  
+      const userListsObject = JSON.parse(localStorage.getItem(currentUserId) || '{}');
+      const userLists = userListsObject.userLists || [];
+  
       const updatedUserLists = [...userLists, [selectedUser]];
-      localStorage.setItem(`${currentUserId}`, JSON.stringify(updatedUserLists));
-
+      localStorage.setItem(currentUserId, JSON.stringify({ ...userListsObject, userLists: updatedUserLists }));
+  
       setUserLists(updatedUserLists);
       setSelectedUsers({ value: "", email: "" });
       setUsername("");
@@ -50,21 +52,16 @@ const NewDirectMessageForm: React.FC<NewDirectMessageFormProps> = ({ onHideModal
       console.error(error);
     }
   };
+  
 
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const authData = JSON.parse(localStorage.getItem("auth") || "{}");
-      const { "access-token": accessToken, client, expiry, uid } = authData;
-  
       try {
-        const response = await getUserss({
-          "access-token": accessToken,
-          client: client,
-          expiry: expiry,
-          uid: uid
-        });
-        
+        const headers = {
+          Authorization: `Bearer ${localStorage.getItem("access-token")}`,
+        };
+        const response = await getUserss(headers);
         const users = response.data;
         setUsers(users);
       } catch (error) {
@@ -72,7 +69,6 @@ const NewDirectMessageForm: React.FC<NewDirectMessageFormProps> = ({ onHideModal
         setErrorMessage("Failed to fetch users");
       }
     };
-  
     fetchUsers();
   }, []);
 

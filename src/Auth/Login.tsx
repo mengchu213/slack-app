@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { loginUser, getUserss, getMessages } from "../utils/api";
+import { loginUser, getUserss } from "../utils/api";
 import { useNavigate } from "react-router-dom";
 
 interface LoginFormData {
@@ -27,68 +27,24 @@ export const LoginForm = () => {
     setErrorMessage("");
     try {
       const headers = await loginUser(formData);
-      console.log(headers);
       setSuccessMessage("Login successful");
       localStorage.setItem("auth", JSON.stringify(headers));
       const email = formData.email;
       const userListResponse = await getUserss({});
       const userList = userListResponse.data;
-      const messages: any[] = [];
-      const maxConcurrentRequests = 100;
-      let promisePool = [];
-      let receiverId;
-      JSON.parse(localStorage.getItem("auth") || "{}");
-      navigate("/dashboard");
       const matchingUser = userList.find(user => user.uid === email);
       if (matchingUser) {
         const receiverId = matchingUser.id;
         localStorage.setItem('currentUser', JSON.stringify(receiverId))
       }
-      for (let current = 0; current < userList.length; current++) {
-        if (userList[current].id !== receiverId) {
-          const promise = getMessages(userList[current].id, "User", headers);
-          promisePool.push(promise);
-
-          if (promisePool.length >= maxConcurrentRequests || current === userList.length - 1) {
-            const messagesResponse = await Promise.all(promisePool);
-            messages.push(...messagesResponse);
-
-            promisePool = [];
-          }
-        }
-      }
-
-      const currentUserId: string = localStorage.currentUser || "";
-      console.log(messages);
-      const filteredMessages = messages
-        .filter(item => item.data.some((msg: { sender: any; receiver: any; }) => {
-          const { sender, receiver } = msg;
-          const isSenderOrReceiverCurrentUser =
-            sender.id === currentUserId || receiver.id === currentUserId;
-          return !isSenderOrReceiverCurrentUser;
-        }))
-        .map(item => item.data[0])
-        .map(msg => {
-          const { sender, receiver } = msg;
-          const recipient = sender.id === currentUserId ? receiver : sender;
-          return {
-            id: recipient.id,
-            uid: recipient.uid
-          };
-        });
-      console.log(filteredMessages);
-
-      const userLists = JSON.parse(localStorage.getItem(currentUserId) ?? "{}");
-      userLists.userLists = filteredMessages;
-
-      localStorage.setItem(currentUserId, JSON.stringify(userLists));
-
-
+      navigate("/dashboard");
     } catch (error) {
       console.error(error);
       setErrorMessage("Invalid email or password");
+      return;
     }
   };
+  
 
   useEffect(() => {
     const { "access-token": accessToken, client, expiry, uid } = JSON.parse(localStorage.getItem("auth") || "{}");
@@ -111,6 +67,7 @@ export const LoginForm = () => {
           value={formData.email}
           onChange={handleInputChange}
           required
+          autoComplete="username"
           className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
         />
       </label>
@@ -122,6 +79,7 @@ export const LoginForm = () => {
           value={formData.password}
           onChange={handleInputChange}
           required
+          autoComplete="current-password"
           className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
         />
       </label>

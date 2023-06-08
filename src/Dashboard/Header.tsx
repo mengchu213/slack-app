@@ -4,6 +4,7 @@ import SearchBar from "./SearchBar";
 import {ReactComponent as Logo} from "../assets/logo.svg";
 
 const Header: React.FC = () => {
+  const currentUser: string | null = localStorage.getItem("uid");
   return (
     <header className="flex justify-between items-center bg-gray-800 px-4 py-2 border-b border-gray-200">
       <div className="header__left">
@@ -13,7 +14,7 @@ const Header: React.FC = () => {
         <SearchBar />
       </div>
       <div className="header__right">
-        <p className="text-white">Michael Langdon</p>
+        <p className="text-white">{currentUser}</p>
       </div>
     </header>
   );
