@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import axios from "axios";
-import {sendMessage, getAuthHeaders} from "../utils/api"; // Import from your API file
+import {sendMessage, getAuthHeaders} from "../utils/api";
 
 interface MessageInputProps {
   addMessage: (channelId: number, message: Message) => void;
