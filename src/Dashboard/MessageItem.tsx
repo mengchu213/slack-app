@@ -1,28 +1,26 @@
 import React from "react";
 
-interface Sender {
-  id: number;
-  provider: string;
-  uid: string;
-}
-
 interface Message {
-  id: number;
+  id?: number;
   body: string;
-  created_at: string;
-  receiver: {id: number; provider: string; uid: string};
-  sender: Sender;
+  sender_id: number;
+  receiver_id: number;
+  created_at?: string;
+  updated_at?: string;
+  senderEmail?: string;
 }
 
 interface MessageItemProps {
-  message: {id: number; text: string; sender: string};
+  message: Message;
 }
 
 const MessageItem: React.FC<MessageItemProps> = ({message}) => {
   return (
     <li className="px-4 py-2">
       <p className="text-sm text-gray-200">
-        <strong className="text-white">{message.sender}:</strong> {message.text}
+        <strong className="text-white">{message.sender_id}:</strong>{" "}
+        <h4>{message.senderEmail}</h4>
+        {message.body}
       </p>
     </li>
   );

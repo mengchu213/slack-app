@@ -1,12 +1,20 @@
 import React, {useState} from "react";
 import axios from "axios";
+import {sendMessage, getAuthHeaders} from "../utils/api"; // Import from your API file
 
 interface MessageInputProps {
-  addMessage: (
-    channelId: number,
-    message: {id: number; text: string; sender: string}
-  ) => void;
+  addMessage: (channelId: number, message: Message) => void;
   selectedChannel: number | null;
+}
+
+interface Message {
+  id?: number;
+  body: string;
+  sender_id: number;
+  receiver_id: number;
+  created_at?: string;
+  updated_at?: string;
+  senderEmail?: string;
 }
 
 const MessageInput: React.FC<MessageInputProps> = ({
@@ -26,43 +34,28 @@ const MessageInput: React.FC<MessageInputProps> = ({
       return;
     }
 
+    const sender_id = Number(localStorage.getItem("uid"));
+    const currentUserEmail = localStorage.getItem("email");
     const newMessage = {
+      body: message,
+      sender_id,
       receiver_id: selectedChannel,
       receiver_class: "Channel",
-      body: message,
-    };
-
-    const headers = {
-      "access-token": localStorage.getItem("access-token"),
-      client: localStorage.getItem("client"),
-      expiry: localStorage.getItem("expiry"),
-      uid: localStorage.getItem("uid"),
+      senderEmail: currentUserEmail,
     };
 
     try {
-      const response = await axios.post(
-        "http://206.189.91.54/api/v1/messages",
-        newMessage,
-        {headers}
-      );
-      if (response.data.errors) {
-        console.log("API errors:", response.data.errors);
-      }
-      console.log("API response:", response);
-      console.log("API response data:", response.data);
-      const sender = localStorage.getItem("currentUserEmail");
+      const response = await sendMessage(newMessage, getAuthHeaders());
 
-      if (response.status === 200 && sender) {
-        const newMessage = {
-          id: response.data.data.id,
-          text: response.data.data.body,
-          sender: sender,
-        };
-        addMessage(selectedChannel, newMessage);
+      if (response.errors) {
+        console.log("API errors:", response.errors);
+      } else {
+        const returnedMessage = response;
+        addMessage(selectedChannel, returnedMessage);
         setMessage("");
       }
     } catch (error) {
-      console.error("Failed to post message:", error);
+      console.error("Error in handleFormSubmit:", error);
     }
   };
 

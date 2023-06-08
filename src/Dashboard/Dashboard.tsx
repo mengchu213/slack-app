@@ -15,13 +15,25 @@ interface DashboardProps {
   setSelectedChannel: Dispatch<
     SetStateAction<{id: number; name: string} | null>
   >;
-  messages: Record<number, Array<{id: number; text: string; sender: string}>>;
-  addMessage: (
-    channelId: number,
-    message: {id: number; text: string; sender: string}
-  ) => void;
+  messages: Record<number, Array<Message>>;
+
+  addMessage: (channelId: number, message: Message) => void;
+}
+interface Sender {
+  id: number;
+  provider: string;
+  uid: string;
 }
 
+interface Message {
+  id?: number;
+  body: string;
+  sender_id: number;
+  receiver_id: number;
+  created_at?: string;
+  updated_at?: string;
+  senderEmail?: string;
+}
 const Dashboard: React.FC<DashboardProps> = ({
   channels,
   setChannels,
@@ -31,15 +43,9 @@ const Dashboard: React.FC<DashboardProps> = ({
   const [showNewChannel, setShowNewChannel] = useState(false);
   const [showNewDirectMessage, setShowNewDirectMessage] = useState(false);
   const [showUserProfile, setShowUserProfile] = useState(false);
+  const [messages, setMessages] = useState<Record<number, Message[]>>({});
 
-  const [messages, setMessages] = useState<
-    Record<number, Array<{id: number; text: string; sender: string}>>
-  >({});
-
-  const addMessage = (
-    channelId: number,
-    newMessage: {id: number; text: string; sender: string}
-  ) => {
+  const addMessage = (channelId: number, newMessage: Message) => {
     setMessages((prevMessages) => {
       const channelMessages = prevMessages[channelId] || [];
       const updatedMessages = {
@@ -47,7 +53,6 @@ const Dashboard: React.FC<DashboardProps> = ({
         [channelId]: [...channelMessages, newMessage],
       };
 
-      // store the updated messages in local storage
       const currentUser = localStorage.getItem("currentUser");
       if (currentUser) {
         localStorage.setItem(
@@ -66,14 +71,14 @@ const Dashboard: React.FC<DashboardProps> = ({
     setShowNewChannel(true);
   };
 
-  const handleDeleteChannel = (id: string) => {
+  const handleDeleteChannel = (id: number) => {
     const currentUser = localStorage.getItem("currentUser");
     if (currentUser) {
       let storedChannels = JSON.parse(
         localStorage.getItem(`${currentUser}.channelLists`) || "[]"
       );
       storedChannels = storedChannels.filter(
-        (channel: {id: string}) => channel && channel.id !== id
+        (channel: {id: number}) => channel && channel.id !== id
       );
 
       localStorage.setItem(
@@ -87,9 +92,9 @@ const Dashboard: React.FC<DashboardProps> = ({
   const handleLogout = () => {
     localStorage.removeItem("auth");
     localStorage.removeItem("currentUser");
-    localStorage.removeItem(`${localStorage.getItem("currentUser")}.messages`); // add this line
+    localStorage.removeItem(`${localStorage.getItem("currentUser")}.messages`);
     setChannels([]);
-    setMessages({}); // and reset the messages state
+    setMessages({});
     navigate("/");
   };
 

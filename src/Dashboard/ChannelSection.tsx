@@ -3,14 +3,14 @@ import ChannelItem from "./ChannelItem";
 import {FaPlus} from "react-icons/fa";
 interface ChannelSectionProps {
   onAddChannel: () => void;
-  channels: Array<{id: string; name: string}>;
+  channels: Array<{id: number; name: string}>;
   setChannels: React.Dispatch<
-    React.SetStateAction<Array<{id: string; name: string}>>
+    React.SetStateAction<Array<{id: number; name: string}>>
   >;
   setSelectedChannel: React.Dispatch<
     React.SetStateAction<{id: number; name: string} | null>
   >;
-  handleDeleteChannel: (id: string) => void;
+  handleDeleteChannel: (id: number) => void;
 }
 
 const ChannelSection: React.FC<ChannelSectionProps> = ({
@@ -42,15 +42,18 @@ const ChannelSection: React.FC<ChannelSectionProps> = ({
         </button>
       </div>
 
-      {channels.filter(Boolean).map((channel: {id: string; name: string}) => (
-        <ChannelItem
-          key={channel.id}
-          id={channel.id}
-          name={channel.name}
-          setSelectedChannel={setSelectedChannel}
-          handleDeleteChannel={handleDeleteChannel}
-        />
-      ))}
+      {channels.filter(Boolean).map((channel: {id: number; name: string}) => {
+        console.log("Rendering channel: ", channel);
+        return (
+          <ChannelItem
+            key={channel.id}
+            id={channel.id}
+            name={channel.name}
+            setSelectedChannel={setSelectedChannel}
+            handleDeleteChannel={handleDeleteChannel}
+          />
+        );
+      })}
     </div>
   );
 };

@@ -1,12 +1,13 @@
 import React, {useState, useEffect, useRef} from "react";
 import {FaCaretDown} from "react-icons/fa";
+
 interface ChannelItemProps {
-  id: string;
+  id: number;
   name: string;
   setSelectedChannel: React.Dispatch<
     React.SetStateAction<{id: number; name: string} | null>
   >;
-  handleDeleteChannel: (id: string) => void;
+  handleDeleteChannel: (id: number) => void;
 }
 
 const ChannelItem: React.FC<ChannelItemProps> = ({
@@ -36,7 +37,7 @@ const ChannelItem: React.FC<ChannelItemProps> = ({
     <div
       ref={node}
       className="flex justify-between items-center px-5 py-2 cursor-pointer hover:bg-gray-700"
-      onClick={() => setSelectedChannel({id: parseInt(id), name})}
+      onClick={() => setSelectedChannel({id, name})}
     >
       <h3 className="font-medium text-sm">{name}</h3>
       <div className="relative inline-block text-left">

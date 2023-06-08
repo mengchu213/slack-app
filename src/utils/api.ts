@@ -22,18 +22,27 @@ interface User {
   updated_at: string;
 }
 
+interface UserLists {
+  id: any;
+  email: string;
+  data?: object;
+  uid?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 interface ChannelData {
   name: string;
   user_ids: number[];
 }
 
 interface Message {
-  id: number;
+  id?: number;
+  body: string;
   sender_id: number;
   receiver_id: number;
-  body: string;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface UsersChannnel {
@@ -42,43 +51,29 @@ interface UsersChannnel {
   data: any;
 }
 
-const catchError = (error: any): Promise<never> => {
-  if (error.response) {
-    return Promise.reject(
-      new Error(
-        `Server responded with status code ${error.response.status}. Message: ${error.response.data}`
-      )
-    );
-  } else if (error.request) {
-    return Promise.reject(
-      new Error("Request was made but no response was received.")
-    );
-  } else {
-    return Promise.reject(
-      new Error(`Error in request setup. Message: ${error.message}`)
-    );
-  }
-};
-
 export const registerUser = async (registrationData: RegistrationData) => {
   try {
     const response = await axios.post(`${API_URL}/auth/`, registrationData);
     return response.data;
   } catch (error) {
-    return catchError(error);
+    console.error(error);
+    throw error;
   }
 };
 
 export const loginUser = async (loginData: LoginData) => {
   try {
     const response = await axios.post(`${API_URL}/auth/sign_in`, loginData);
+
     localStorage.setItem("access-token", response.headers["access-token"]);
     localStorage.setItem("client", response.headers["client"]);
     localStorage.setItem("expiry", response.headers["expiry"]);
     localStorage.setItem("uid", response.headers["uid"]);
+
     return response.headers;
   } catch (error) {
-    return catchError(error);
+    console.error(error);
+    throw error;
   }
 };
 
@@ -98,7 +93,30 @@ export const getUsers = async (): Promise<{uid: string; data: User[]}> => {
     });
     return response.data;
   } catch (error) {
-    return catchError(error);
+    console.error(error);
+    throw error;
+  }
+};
+
+export const getUserss = async (
+  headers: any
+): Promise<{uid: string; data: UserLists[]}> => {
+  const authData = JSON.parse(localStorage.getItem("auth") || "{}");
+  const {"access-token": accessToken, client, expiry, uid} = authData;
+
+  try {
+    const response = await axios.get(`${API_URL}/users`, {
+      headers: {
+        "access-token": accessToken,
+        client: client,
+        expiry: expiry,
+        uid: uid,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
   }
 };
 
@@ -109,33 +127,40 @@ export const getUsersChannel = async (): Promise<UsersChannnel[]> => {
     });
     return response.data;
   } catch (error) {
-    return catchError(error);
+    console.error(error);
+    throw error;
   }
 };
 
 export const getMessages = async (
   receiverId: number,
-  receiverClass: string
+  receiverClass: string,
+  headers?: any
 ): Promise<{data: Message[]}> => {
   try {
-    const response = await axios.get(
-      `${API_URL}/messages?receiver_id=${receiverId}&receiver_class=${receiverClass}`,
-      {headers: getAuthHeaders()}
-    );
-    return response.data;
-  } catch (error) {
-    return catchError(error);
-  }
-};
-
-export const sendMessage = async (messageData: Message) => {
-  try {
-    const response = await axios.post(`${API_URL}/messages`, messageData, {
-      headers: getAuthHeaders(),
+    const response = await axios.get(`${API_URL}/messages`, {
+      params: {
+        receiver_id: receiverId,
+        receiver_class: receiverClass,
+      },
+      headers: headers || getAuthHeaders(),
     });
     return response.data;
   } catch (error) {
-    return catchError(error);
+    console.error(error);
+    throw error;
+  }
+};
+
+export const sendMessage = async (messageData: Message, headers: any) => {
+  try {
+    const response = await axios.post(`${API_URL}/messages`, messageData, {
+      headers,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error in sendMessage:", error);
+    throw error;
   }
 };
 
@@ -146,19 +171,23 @@ export const createChannel = async (channelData: ChannelData) => {
     });
     return response.data;
   } catch (error) {
-    return catchError(error);
+    console.error(error);
+    throw error;
   }
 };
-
 export const getAndStoreChannels = async () => {
   try {
     const channels = await getUsersChannel();
+
     const currentUser = localStorage.getItem("currentUser");
+
     if (localStorage.getItem(`${currentUser}.channelLists`)) {
       const oldChannels = JSON.parse(
         localStorage.getItem(`${currentUser}.channelLists`) || "[]"
       );
-      const mergedChannels = [...new Set([...oldChannels, ...channels])];
+
+      const mergedChannels = [...oldChannels, ...channels];
+
       localStorage.setItem(
         `${currentUser}.channelLists`,
         JSON.stringify(mergedChannels)
@@ -170,6 +199,7 @@ export const getAndStoreChannels = async () => {
       );
     }
   } catch (error) {
-    return catchError(error);
+    console.error(error);
+    throw error;
   }
 };
