@@ -1,18 +1,16 @@
 import React, {useState, useEffect} from "react";
-import {useNavigate} from "react-router-dom";
 import {createChannel, getUsers} from "../utils/api";
 import Select from "react-select";
 
 interface NewChannelFormProps {
-  setChannels: React.Dispatch<React.SetStateAction<any[]>>;
+  onHideModal: () => void;
 }
 interface ChannelData {
   name: string;
   user_ids: number[];
 }
 
-const NewChannelForm = ({setChannels}: NewChannelFormProps) => {
-  const navigate = useNavigate();
+const NewChannelForm = ({ onHideModal }: NewChannelFormProps) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [channelName, setChannelName] = useState("");
@@ -44,24 +42,15 @@ const NewChannelForm = ({setChannels}: NewChannelFormProps) => {
       };
       const channelData: ChannelData = {
         name: channelName,
-        user_ids: selectedUsers.map((user) => user.value),
+        user_ids: [localStorage.currentUser, ...selectedUsers.map((user) => user.value)],
       };
+      console.log(channelData);
       const response = await createChannel(channelData);
       const newChannel = response.data;
-      setChannels((prevChannels) => [...prevChannels, newChannel]);
-
-      const currentUser = localStorage.getItem("currentUser");
-      const storedChannels = JSON.parse(
-        localStorage.getItem(`${currentUser}.channelLists`) || "[]"
-      );
-      storedChannels.push(newChannel);
-      localStorage.setItem(
-        `${currentUser}.channelLists`,
-        JSON.stringify(storedChannels)
-      );
-      setChannels(storedChannels);
+      console.log(response);
+      console.log(newChannel);
       setSuccessMessage("Channel created successfully");
-      navigate("/dashboard");
+      onHideModal();
     } catch (error) {
       console.error(error);
       setErrorMessage("Failed to create channel");

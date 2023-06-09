@@ -24,7 +24,7 @@ const MessageList = () => {
   }, []);
 
   return (
-    <ul className="flex-grow overflow-auto border-t border-gray-200 mt-2 pt-2">
+    <ul className="flex-grow overflow-auto border-t border-gray-200 mt-2 pt-2 max-h-[77.8vh] scrollbar">
       {messages.map((message, index) => (
         <MessageItem key={`${index}-${message.id}`} message={message} />
       ))}

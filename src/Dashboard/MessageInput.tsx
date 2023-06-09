@@ -4,8 +4,15 @@ import { sendMessages } from "../utils/api";
 const MessageInput = ({ headers = {} }) => {
   const [body, setBody] = useState("");
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setBody(event.target.value);
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === "Enter" && event.shiftKey) {
+      event.preventDefault();
+      setBody((prev) => prev + "\n");
+    }
   };
 
   const receiver = JSON.parse(localStorage.getItem("receiver") || "{}");
@@ -29,10 +36,10 @@ const MessageInput = ({ headers = {} }) => {
       onSubmit={handleFormSubmit}
       className="flex items-center p-4 bg-gray-600"
     >
-      <input
-        type="text"
+      <textarea
         value={body}
         onChange={handleInputChange}
+        onKeyDown={handleKeyDown}
         placeholder="Type your message here"
         className="flex-grow px-4 py-2 mr-2 bg-gray-300 rounded-lg focus:outline-none "
       />

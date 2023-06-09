@@ -1,80 +1,82 @@
-import React, {useState, useEffect, useRef} from "react";
-import {FaCaretDown} from "react-icons/fa";
+import { useState, useEffect } from "react";
+import { getMessages } from "../utils/api";
 
-interface ChannelItemProps {
-  id: number;
-  name: string;
-  setSelectedChannel: React.Dispatch<
-    React.SetStateAction<{id: number; name: string} | null>
-  >;
-  handleDeleteChannel: (id: number) => void;
-}
+export const ChannelItem = () => {
+  const currentUserId: string = localStorage.currentUser || "";
+  const channelListsObject = JSON.parse(localStorage.getItem(currentUserId) || "{}");
+  const channelLists = channelListsObject.channelLists || [];
 
-const ChannelItem: React.FC<ChannelItemProps> = ({
-  id,
-  name,
-  setSelectedChannel,
-  handleDeleteChannel,
-}) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const node = useRef<HTMLDivElement | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [messages, setMessages] = useState<any[]>([]);
 
-  const handleClickOutside = (e: MouseEvent) => {
-    if (node.current?.contains(e.target as Node)) {
-      return;
+  const handleButtonClick = async (id: number) => {
+    setSelectedId(id);
+    localStorage.setItem("receiver", JSON.stringify({ receiverId: id, receiverClass: "Channel" }))
+    try {
+      const response = await getMessages(id, "Channel");
+      setMessages(response.data);
+      localStorage.setItem("message", JSON.stringify(response.data));
+    } catch (error) {
+      console.error(error);
     }
-    setIsOpen(false);
   };
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
+    let interval: any;
+    if (selectedId !== null) {
+      interval = setInterval(async () => {
+        try {
+          const response = await getMessages(selectedId, "Channel");
+          setMessages(response.data);
+          localStorage.setItem("message", JSON.stringify(response.data));
+        } catch (error) {
+          console.error(error);
+        }
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [selectedId]);
+
 
   return (
-    <div
-      ref={node}
-      className="flex justify-between items-center px-5 py-2 cursor-pointer hover:bg-gray-700"
-      onClick={() => setSelectedChannel({id, name})}
-    >
-      <h3 className="font-medium text-sm">{name}</h3>
-      <div className="relative inline-block text-left">
-        <div>
-          <button
-            type="button"
-            className="inline-flex justify-center w-8 h-8 items-center rounded-lg  text-sm font-medium text-gray-300  "
-            id="options-menu"
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsOpen(!isOpen);
-            }}
-          >
-            <FaCaretDown />
-          </button>
-        </div>
-        {isOpen && (
-          <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
-            <div
-              className="py-1"
-              role="menu"
-              aria-orientation="vertical"
-              aria-labelledby="options-menu"
+    <div className="border-b">
+      {channelLists.map((list: any, index: number) => (
+        <div key={index}>
+          {list.map((channel: any) => (
+            <button
+              key={`${channel.id}-${index}`}
+              onClick={() => handleButtonClick(channel.id)}
+              className={`flex items-center justify-between px-5 py-2 rounded-lg hover:bg-gray-600 cursor-pointer transition duration-200 w-11/12 text-left ${channel.id === selectedId ? "bg-gray-600 text-white shadow-lg" : ""
+                }`}
             >
-              <button
-                onClick={() => handleDeleteChannel(id)}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-                role="menuitem"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+              <span className="font-bold">{channel.name}</span>
+              {channel.id === selectedId && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 ml-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              )}
+            </button>
+
+          ))}
+        </div>
+      ))}
+      {messages.map((message: any, index) => (
+        <div key={`${message.id}-${index}`}>
+          <p>{message.text}</p>
+        </div>
+      ))}
     </div>
   );
 };
-
-export default ChannelItem;

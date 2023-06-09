@@ -57,6 +57,12 @@ interface Messages {
   body: string;
 }
 
+interface UsersChannnels {
+  id: number;
+  name: string;
+  data: any;
+}
+
 export const registerUser = async (registrationData: RegistrationData) => {
   try {
     const response = await axios.post(`${API_URL}/auth/`, registrationData);
@@ -192,12 +198,14 @@ export const createChannel = async (channelData: ChannelData) => {
     const response = await axios.post(`${API_URL}/channels`, channelData, {
       headers: getAuthHeaders(),
     });
+    console.log(response)
     return response.data;
   } catch (error) {
     console.error(error);
     throw error;
   }
 };
+
 export const getAndStoreChannels = async () => {
   try {
     const channels = await getUsersChannel();
@@ -226,3 +234,24 @@ export const getAndStoreChannels = async () => {
     throw error;
   }
 };
+
+export const getUsersChannels = async (headers: any): Promise<{ data: UsersChannnels[] }> => {
+  const authData = JSON.parse(localStorage.getItem("auth") || "{}");
+  const { "access-token": accessToken, client, expiry, uid } = authData;
+
+  try {
+    const response = await axios.get(`${API_URL}/channels`, {
+      headers: {
+        "access-token": accessToken,
+        client: client,
+        expiry: expiry,
+        uid: uid
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+

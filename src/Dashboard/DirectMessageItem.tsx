@@ -44,7 +44,7 @@ export const DirectMessageItems = () => {
         <div key={index}>
           {list.map((user: any) => (
             <button
-            key={user.id}
+            key={`${user.id}-${index}`}
             onClick={() => handleButtonClick(user.id)}
             className={`flex items-center justify-between px-5 py-2 rounded-lg hover:bg-gray-600 cursor-pointer transition duration-200 w-11/12 text-left ${
               user.id === selectedId ? "bg-gray-600 text-white shadow-lg" : ""
@@ -72,8 +72,8 @@ export const DirectMessageItems = () => {
           ))}
         </div>
       ))}
-      {messages.map((message: any) => (
-        <div key={message.id}>
+      {messages.map((message: any, index) => (
+        <div key={`${message.id}-${index}`}>
           <p>{message.text}</p>
         </div>
       ))}

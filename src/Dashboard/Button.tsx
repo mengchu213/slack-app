@@ -67,8 +67,9 @@ const Button: React.FC = () => {
         }
         return acc;
       }, []);
-
-      localStorage.setItem(currentUserId, JSON.stringify({ userLists: userListsArray }));
+      let userData = JSON.parse(localStorage.getItem(currentUserId) || '{}');
+      userData.userLists = userListsArray || [];
+      localStorage.setItem(currentUserId, JSON.stringify(userData));
       window.location.reload();
     } catch (error) {
       console.error(error);
