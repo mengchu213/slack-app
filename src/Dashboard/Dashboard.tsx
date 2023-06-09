@@ -1,4 +1,10 @@
-import {useState, useEffect, Dispatch, SetStateAction} from "react";
+import {
+  useState,
+  useEffect,
+  Dispatch,
+  SetStateAction,
+  useCallback,
+} from "react";
 import Sidebar from "./Sidebar";
 import Workspace from "./Workspace";
 import Header from "./Header";
@@ -45,7 +51,7 @@ const Dashboard: React.FC<DashboardProps> = ({
   const [showUserProfile, setShowUserProfile] = useState(false);
   const [messages, setMessages] = useState<Record<number, Message[]>>({});
 
-  const addMessage = (channelId: number, newMessage: Message) => {
+  const addMessage = useCallback((channelId: number, newMessage: Message) => {
     setMessages((prevMessages) => {
       const channelMessages = prevMessages[channelId] || [];
       const updatedMessages = {
@@ -63,7 +69,7 @@ const Dashboard: React.FC<DashboardProps> = ({
 
       return updatedMessages;
     });
-  };
+  }, []);
 
   const navigate = useNavigate();
 
@@ -129,6 +135,7 @@ const Dashboard: React.FC<DashboardProps> = ({
           handleDeleteChannel={handleDeleteChannel}
           setSelectedChannel={setSelectedChannel}
           setChannels={setChannels}
+          onAddUser={() => console.log("Add user not implemented yet")}
         />
 
         <Workspace

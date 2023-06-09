@@ -1,4 +1,10 @@
-import {getMessages, getUserss} from "../utils/api";
+import React from "react";
+import {
+  getMessages,
+  getUserss,
+  getAndStoreChannels,
+  getUsersChannel,
+} from "../utils/api";
 
 const Button: React.FC = () => {
   const handleClick = async () => {
@@ -79,6 +85,9 @@ const Button: React.FC = () => {
         currentUserId,
         JSON.stringify({userLists: userListsArray})
       );
+
+      await getAndStoreChannels(headers);
+
       window.location.reload();
     } catch (error) {
       console.error(error);
@@ -96,7 +105,8 @@ const Button: React.FC = () => {
         viewBox="0 0 24 24"
         strokeWidth={2.5}
         stroke="currentColor"
-        className="w-4 h-4"
+        className="w
+-4 h-4"
       >
         <path
           strokeLinecap="round"

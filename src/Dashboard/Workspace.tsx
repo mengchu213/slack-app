@@ -29,8 +29,21 @@ interface WorkspaceProps {
 const Workspace: React.FC<WorkspaceProps> = ({
   selectedChannel,
   selectedChannelName,
+  messages,
+  addMessage,
 }) => {
   useEffect(() => {
+    if (selectedChannel) {
+      localStorage.setItem(
+        "receiver",
+        JSON.stringify({receiverId: selectedChannel, receiverClass: "Channel"}) // receiverClass could be something else based on your requirements
+      );
+    }
+  }, [selectedChannel]);
+
+  useEffect(() => {
+    let isCancelled = false;
+
     const fetchMessages = async () => {
       if (!selectedChannel) {
         return;
@@ -42,11 +55,10 @@ const Workspace: React.FC<WorkspaceProps> = ({
           "Channel",
           getAuthHeaders()
         );
-        if (response.data && Array.isArray(response.data)) {
-          localStorage.setItem(
-            selectedChannel.toString(),
-            JSON.stringify(response.data)
-          );
+        if (!isCancelled && response.data && Array.isArray(response.data)) {
+          response.data.forEach((message) => {
+            addMessage(selectedChannel, message);
+          });
         } else {
           console.log("Unexpected data structure", response.data);
         }
@@ -55,7 +67,11 @@ const Workspace: React.FC<WorkspaceProps> = ({
       }
     };
     fetchMessages();
-  }, [selectedChannel]);
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [selectedChannel, addMessage]);
 
   return (
     <div className="flex flex-col flex-grow bg-gray-700 ">
@@ -65,7 +81,7 @@ const Workspace: React.FC<WorkspaceProps> = ({
           : "No Channel Selected"}
       </div>
 
-      <MessageList channelId={selectedChannel ?? null} />
+      <MessageList channelId={selectedChannel ?? null} messages={messages} />
       <MessageInput selectedChannel={selectedChannel ?? null} />
     </div>
   );

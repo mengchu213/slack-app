@@ -26,16 +26,18 @@ const MessageInput: React.FC<MessageInputProps> = ({
   const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    const receiver = JSON.parse(localStorage.getItem("receiver") || "{}");
-    const receiverId = receiver.receiverId;
-    const receiverClass = receiver.receiverClass;
-
-    if (receiverId && receiverClass) {
+    if (selectedChannel) {
       try {
+        console.log({
+          receiver_id: selectedChannel,
+          receiver_class: "Channel",
+          body: body,
+        });
+
         await sendMessages(
           {
-            receiver_id: receiverId,
-            receiver_class: receiverClass,
+            receiver_id: selectedChannel,
+            receiver_class: "Channel",
             body: body,
           },
           headers

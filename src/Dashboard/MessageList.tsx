@@ -13,27 +13,19 @@ interface Message {
 
 interface MessageListProps {
   channelId: number | null;
+  messages: Record<number, Message[]>;
 }
 
-const MessageList: React.FC<MessageListProps> = ({channelId}) => {
-  const [messages, setMessages] = useState<Message[]>([]);
+const MessageList: React.FC<MessageListProps> = ({channelId, messages}) => {
+  const messagesForChannel =
+    channelId !== null && messages[channelId] ? messages[channelId] : [];
+  console.log("Received these messages:", messagesForChannel);
 
-  useEffect(() => {
-    if (channelId !== null) {
-      const storedMessages = localStorage.getItem(channelId.toString());
-      if (storedMessages !== null) {
-        setMessages(JSON.parse(storedMessages));
-      }
-    }
-  }, [channelId]);
-
-  console.log("Received these messages:", messages);
   return (
     <ul className="flex-grow overflow-auto">
-      {Array.isArray(messages) &&
-        messages.map((message) => (
-          <MessageItem key={message.id} message={message} />
-        ))}
+      {messagesForChannel.map((message: Message, index: number) =>
+        message.id ? <MessageItem key={index} message={message} /> : null
+      )}
     </ul>
   );
 };

@@ -30,6 +30,14 @@ interface UserLists {
   created_at: string;
   updated_at: string;
 }
+interface ChannelLists {
+  id: any;
+  email: string;
+  data?: object;
+  uid?: string;
+  created_at: string;
+  updated_at: string;
+}
 
 interface ChannelData {
   name: string;
@@ -126,10 +134,20 @@ export const getUserss = async (
   }
 };
 
-export const getUsersChannel = async (): Promise<UsersChannnel[]> => {
+export const getUsersChannel = async (
+  headers: any
+): Promise<{uid: string; data: ChannelLists[]}> => {
+  const authData = JSON.parse(localStorage.getItem("auth") || "{}");
+  const {"access-token": accessToken, client, expiry, uid} = authData;
+
   try {
     const response = await axios.get(`${API_URL}/channels`, {
-      headers: getAuthHeaders(),
+      headers: {
+        "access-token": accessToken,
+        client: client,
+        expiry: expiry,
+        uid: uid,
+      },
     });
     return response.data;
   } catch (error) {
@@ -179,12 +197,18 @@ export const sendMessage = async (messageData: Message, headers: any) => {
 };
 
 export const sendMessages = async (messageData: Messages, headers: any) => {
-  const {
-    "access-token": accessToken,
-    client,
-    expiry,
-    uid,
-  } = JSON.parse(localStorage.getItem("auth") || "{}") ?? {};
+  console.log("sendMessages function called");
+
+  const authFromStorage = localStorage.getItem("auth");
+  console.log("auth from localStorage:", authFromStorage);
+
+  const parsedAuth = JSON.parse(authFromStorage || "{}");
+  console.log("Parsed auth:", parsedAuth);
+
+  const {"access-token": accessToken, client, expiry, uid} = parsedAuth ?? {};
+
+  console.log("Headers:", {accessToken, client, expiry, uid});
+  console.log("Message data:", messageData);
 
   try {
     const response = await axios.post(`${API_URL}/messages`, messageData, {
@@ -195,6 +219,7 @@ export const sendMessages = async (messageData: Messages, headers: any) => {
         uid,
       },
     });
+    console.log("Message sent successfully:", response.data);
     return response.data;
   } catch (error) {
     console.error(error);
@@ -216,7 +241,16 @@ export const createChannel = async (channelData: ChannelData) => {
 
 export const getAndStoreChannels = async () => {
   try {
-    const channels = await getUsersChannel();
+    const authData = JSON.parse(localStorage.getItem("auth") || "{}");
+    const {"access-token": accessToken, client, expiry, uid} = authData;
+    const headers = {
+      "access-token": accessToken,
+      client: client,
+      expiry: expiry,
+      uid: uid,
+    };
+
+    const channels = await getUsersChannel(headers);
 
     const currentUser = localStorage.getItem("currentUser");
 
@@ -225,7 +259,7 @@ export const getAndStoreChannels = async () => {
         localStorage.getItem(`${currentUser}.channelLists`) || "[]"
       );
 
-      const mergedChannels = [...oldChannels, ...channels];
+      const mergedChannels = [...oldChannels, ...channels.data];
 
       localStorage.setItem(
         `${currentUser}.channelLists`,
@@ -234,7 +268,7 @@ export const getAndStoreChannels = async () => {
     } else {
       localStorage.setItem(
         `${currentUser}.channelLists`,
-        JSON.stringify(channels)
+        JSON.stringify(channels.data)
       );
     }
   } catch (error) {
