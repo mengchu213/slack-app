@@ -1,54 +1,29 @@
 import React, {useState} from "react";
 import {sendMessages} from "../utils/api";
 
-interface MessageInputProps {
-  selectedChannel: number | null;
-  headers?: {};
-}
-
-const MessageInput: React.FC<MessageInputProps> = ({
-  selectedChannel,
-  headers = {},
-}) => {
+const MessageInput = ({headers = {}}) => {
   const [body, setBody] = useState("");
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setBody(event.target.value);
   };
 
-  const selectReceiver = (receiverId: number, receiverClass: string) => {
-    localStorage.setItem(
-      "receiver",
-      JSON.stringify({receiverId, receiverClass})
-    );
-  };
+  const receiver = JSON.parse(localStorage.getItem("receiver") || "{}");
 
   const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
-    if (selectedChannel) {
-      try {
-        console.log({
-          receiver_id: selectedChannel,
-          receiver_class: "Channel",
+    try {
+      await sendMessages(
+        {
+          receiver_id: receiver.receiverId,
+          receiver_class: receiver.receiverClass,
           body: body,
-        });
-
-        await sendMessages(
-          {
-            receiver_id: selectedChannel,
-            receiver_class: "Channel",
-            body: body,
-          },
-          headers
-        );
-
-        setBody("");
-      } catch (error) {
-        console.error(error);
-      }
-    } else {
-      console.log("Receiver data is missing or invalid.");
+        },
+        headers
+      );
+      setBody("");
+    } catch (error) {
+      console.error(error);
     }
   };
 
