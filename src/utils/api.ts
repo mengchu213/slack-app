@@ -276,3 +276,34 @@ export const getAndStoreChannels = async () => {
     throw error;
   }
 };
+
+export const addUserToChannel = async (channelId: number, memberId: number) => {
+  try {
+    const response = await axios.post(
+      `http://206.189.91.54/api/v1/channel/add_member`,
+      {id: channelId, member_id: memberId},
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const getUsersInChannel = async (channelId: number) => {
+  try {
+    const response = await axios.get(
+      `http://206.189.91.54/api/v1/channels/${channelId}`,
+      {
+        headers: getAuthHeaders(),
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
