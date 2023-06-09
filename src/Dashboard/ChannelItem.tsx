@@ -23,7 +23,7 @@ export const ChannelItem = () => {
 
   useEffect(() => {
     let interval: any;
-    if (selectedId !== null) {
+    if (selectedId !== null && localStorage.receiver.receiverClass === "Channel") {
       interval = setInterval(async () => {
         try {
           const response = await getMessages(selectedId, "Channel");

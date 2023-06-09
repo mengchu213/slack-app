@@ -23,7 +23,7 @@ export const DirectMessageItems = () => {
 
   useEffect(() => {
     let interval: any;
-    if (selectedId !== null) {
+    if (selectedId !== null && localStorage.receiver.receiverClass === "User") {
       interval = setInterval(async () => {
         try {
           const response = await getMessages(selectedId, "User");
